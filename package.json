@@ -1,14 +1,13 @@
 {
-  "name": "typescript-nextjs-starter",
-  "description": "A TypeScript starter for Next.js that includes all you need to build amazing projects",
-  "version": "1.0.0",
+  "name": "survey-chain",
+  "description": "An application for performing transparent and verifiable surveys",
+  "version": "0.1.0",
   "private": true,
-  "author": "João Pedro Schmitz <hey@joaopedro.dev> (@jpedroschmitz)",
+  "author": "Ben Schwartz <schwartz.ben0@gmail.com> (@bmschwartz)",
   "license": "MIT",
   "keywords": [
-    "nextjs",
-    "starter",
-    "typescript"
+    "web3",
+    "ethereum"
   ],
   "scripts": {
     "dev": "next",
