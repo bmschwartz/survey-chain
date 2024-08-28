@@ -1,46 +1,44 @@
 import { Box, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { Question } from '@/types';
-import QuestionEditor from './QuestionEditor';
+import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
+import QuestionEditor from './question/QuestionEditor';
 
-interface SurveyStepProps {
-  step: number;
-  surveyData: any;
-  onSurveyDataChange: (newData: any) => void;
-}
+const SurveyStep: React.FC = () => {
+  const { activeStep, title, description, setTitle, setDescription } = useSurveyBuilder();
 
-const SurveyStep: React.FC<SurveyStepProps> = ({ step, surveyData, onSurveyDataChange }) => {
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSurveyDataChange({ title: e.target.value });
-  };
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTitle(e.target.value);
+    },
+    [setTitle]
+  );
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSurveyDataChange({ description: e.target.value });
-  };
+  const handleDescriptionChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDescription(e.target.value);
+    },
+    [setDescription]
+  );
 
-  const handleQuestionChange = (questions: Question[]) => {
-    onSurveyDataChange({ questions });
-  };
-
-  switch (step) {
+  switch (activeStep) {
     case 0:
       return (
         <Box>
-          <TextField label="Survey Title" fullWidth value={surveyData.title} onChange={handleTitleChange} />
+          <TextField label="Survey Title" fullWidth value={title} onChange={handleTitleChange} />
           <TextField
             label="Survey Description"
             fullWidth
             multiline
             rows={4}
-            value={surveyData.description}
+            value={description}
             onChange={handleDescriptionChange}
             sx={{ marginTop: '1rem' }}
           />
         </Box>
       );
     case 1:
-      return <QuestionEditor questions={surveyData.questions} onQuestionsChange={handleQuestionChange} />;
+      return <QuestionEditor />;
     case 2:
       return (
         <Box>
