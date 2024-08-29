@@ -12,13 +12,15 @@ interface SurveyBuilderContextType {
   setDescription: React.Dispatch<React.SetStateAction<string>>;
 
   questions: Question[];
-  selectedQuestionId: number | null;
-  addQuestion: () => void;
+  selectedQuestion: Question | null;
+  isAddingNewQuestion: boolean;
+  addQuestion: (newQuestion: Question) => void;
   updateQuestion: (updatedQuestion: Question) => void;
   deleteQuestion: (id: number) => void;
-  selectQuestion: (id: number) => void;
-
+  selectQuestion: (id: number | null) => void;
+  resetNewQuestion: () => Question;
   resetSurvey: () => void;
+  setIsAddingNewQuestion: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SurveyBuilderContext = createContext<SurveyBuilderContextType | undefined>(undefined);
@@ -40,25 +42,27 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
+  const [isAddingNewQuestion, setIsAddingNewQuestion] = useState<boolean>(true);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
 
   const resetSurvey = () => {
     setTitle('');
     setActiveStep(0);
     setQuestions([]);
     setDescription('');
-    setSelectedQuestionId(null);
+    setSelectedQuestion(null);
   };
 
-  const addQuestion = () => {
-    const newQuestion: Question = {
-      id: questions.length + 1,
-      text: '',
-      type: QuestionType.MultipleChoice,
-      options: [],
-    };
+  const resetNewQuestion = (): Question => ({
+    id: questions.length + 1,
+    text: '',
+    type: QuestionType.MultipleChoice,
+    options: [''], // Initialize with one empty option
+  });
+
+  const addQuestion = (newQuestion: Question) => {
     setQuestions([...questions, newQuestion]);
-    setSelectedQuestionId(newQuestion.id);
+    setSelectedQuestion(newQuestion);
   };
 
   const updateQuestion = (updatedQuestion: Question) => {
@@ -67,13 +71,28 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   };
 
   const deleteQuestion = (id: number) => {
+    const questionIndex = questions.findIndex((q) => q.id === id);
     const updatedQuestions = questions.filter((q) => q.id !== id);
     setQuestions(updatedQuestions);
-    setSelectedQuestionId(null);
+
+    if (updatedQuestions.length === 0) {
+      setSelectedQuestion(null);
+    } else if (questionIndex > 0) {
+      setSelectedQuestion(updatedQuestions[questionIndex - 1]);
+    } else {
+      setSelectedQuestion(updatedQuestions[0]);
+    }
   };
 
-  const selectQuestion = (id: number) => {
-    setSelectedQuestionId(id);
+  const selectQuestion = (id: number | null) => {
+    console.log('setting selected question', id);
+    if (id === null) {
+      setIsAddingNewQuestion(true);
+      setSelectedQuestion(null);
+      return;
+    }
+    setIsAddingNewQuestion(false);
+    setSelectedQuestion(questions.find((q) => q.id === id) || null);
   };
 
   return (
@@ -83,7 +102,9 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
         title,
         description,
         questions,
-        selectedQuestionId,
+        selectedQuestion,
+        isAddingNewQuestion,
+        setIsAddingNewQuestion,
         setActiveStep,
         setTitle,
         setDescription,
@@ -91,6 +112,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
         updateQuestion,
         deleteQuestion,
         selectQuestion,
+        resetNewQuestion,
         resetSurvey,
       }}
     >

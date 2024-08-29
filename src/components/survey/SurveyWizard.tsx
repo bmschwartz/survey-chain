@@ -49,8 +49,16 @@ const SurveyWizard: React.FC = () => {
         <>
           <SurveyStep />
           {isLastStep && <SurveyPreview />}
-          <Box sx={{ marginTop: '2rem', textAlign: 'center' }}>
-            <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+          <Box
+            sx={{
+              marginTop: '2rem',
+              textAlign: 'center',
+              display: 'flex', // Use flexbox to align buttons properly
+              justifyContent: 'center', // Center the buttons
+              gap: '1rem', // Add space between the buttons
+            }}
+          >
+            <Button disabled={activeStep === 0} onClick={handleBack}>
               Back
             </Button>
             <Button variant="contained" color="primary" onClick={handleNext}>
