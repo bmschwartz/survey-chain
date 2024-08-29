@@ -87,7 +87,6 @@ const QuestionEditorSidebar: React.FC<QuestionEditorSidebarProps> = ({ onAddNew 
                 key={question.id}
                 selected={question.id === selectedQuestion?.id}
                 onClick={() => {
-                  console.log('selecting question with id:', question.id);
                   selectQuestion(question.id);
                 }}
                 sx={{

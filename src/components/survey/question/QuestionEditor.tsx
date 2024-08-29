@@ -12,8 +12,6 @@ const QuestionEditor: React.FC = () => {
     selectQuestion(null);
   };
 
-  console.log('editor detail will show question ', selectedQuestion);
-
   return (
     <Grid2 container spacing={2}>
       <Grid2 size={{ xs: 3 }}>

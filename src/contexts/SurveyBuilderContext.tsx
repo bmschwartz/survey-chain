@@ -85,7 +85,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   };
 
   const selectQuestion = (id: number | null) => {
-    console.log('setting selected question', id);
     if (id === null) {
       setIsAddingNewQuestion(true);
       setSelectedQuestion(null);

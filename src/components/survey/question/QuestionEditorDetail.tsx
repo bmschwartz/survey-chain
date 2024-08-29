@@ -1,4 +1,5 @@
 import { Box, Button, Divider, MenuItem, Modal, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
+import { isEqual } from 'lodash';
 import React, { useEffect, useState } from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
@@ -24,8 +25,11 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
       options: [''], // Initialize with one empty option
     }
   );
+  const [initialQuestion, setInitialQuestion] = useState<Question | null>(question);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
+
+  const hasLocalChanges = !isEqual(initialQuestion, localQuestion);
 
   useEffect(() => {
     // Ensure there's at least one empty option for MultipleChoice or Dropdown
@@ -79,10 +83,11 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
     if (validateQuestion()) {
       if (isNew) {
         addQuestion(localQuestion);
+        onAddNew(); // Prepare for next question
       } else {
         updateQuestion(localQuestion);
+        setInitialQuestion(localQuestion);
       }
-      onAddNew(); // Prepare for next question
     }
   };
 
@@ -217,7 +222,13 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
         </Box>
       )}
       <Box sx={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-        <Button variant="contained" color="primary" onClick={handleSaveQuestion} sx={{ marginRight: '1rem' }}>
+        <Button
+          variant={hasLocalChanges ? 'contained' : 'outlined'}
+          color={hasLocalChanges ? 'primary' : 'success'}
+          disabled={!hasLocalChanges}
+          onClick={handleSaveQuestion}
+          sx={{ marginRight: '1rem' }}
+        >
           {isNew ? 'Save' : 'Update'}
         </Button>
         {!isNew && (
@@ -241,8 +252,13 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
           }}
         >
           <Typography variant="h6">Are you sure you want to delete this question?</Typography>
-          <Box sx={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
-            <Button variant="contained" color="primary" onClick={() => setShowDeleteConfirmation(false)}>
+          <Box sx={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mr: '1rem' }}
+              onClick={() => setShowDeleteConfirmation(false)}
+            >
               Cancel
             </Button>
             <Button variant="outlined" color="error" onClick={confirmDeleteQuestion}>

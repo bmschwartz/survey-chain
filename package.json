@@ -31,6 +31,7 @@
     "@mui/icons-material": "6.0.0",
     "@mui/material": "6.0.0",
     "@mui/styles": "6.0.0",
+    "lodash": "4.17.21",
     "next": "14.2.6",
     "react": "18.3.1",
     "react-dom": "18.3.1"
@@ -39,6 +40,7 @@
     "@commitlint/cli": "19.4.0",
     "@commitlint/config-conventional": "19.2.2",
     "@ianvs/prettier-plugin-sort-imports": "4.3.1",
+    "@types/lodash": "4.17.7",
     "@types/node": "20.16.1",
     "@types/react": "18.3.4",
     "@types/react-dom": "18.3.0",
