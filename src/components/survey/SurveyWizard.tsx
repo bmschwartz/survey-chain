@@ -48,6 +48,7 @@ const SurveyWizard: React.FC = () => {
       ) : (
         <>
           <SurveyStep />
+          {isLastStep && <SurveyPreview />}
           <Box sx={{ marginTop: '2rem', textAlign: 'center' }}>
             <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
               Back
@@ -56,7 +57,6 @@ const SurveyWizard: React.FC = () => {
               {isLastStep ? 'Finish' : 'Next'}
             </Button>
           </Box>
-          {isLastStep && <SurveyPreview />}
         </>
       )}
     </Container>

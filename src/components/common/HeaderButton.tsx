@@ -13,15 +13,16 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ onClick, startIcon, childre
       startIcon={startIcon}
       endIcon={endIcon}
       sx={{
-        color: '#000000',
+        color: '#000000', // Black text color
         fontSize: '1.2rem',
         marginLeft: '20px',
         borderRadius: '8px',
         padding: '8px 16px',
         fontFamily: 'Poppins, sans-serif',
+        backgroundColor: '#ffffff', // White background
         '&:hover': {
-          color: '#0d47a1',
-          backgroundColor: '#e3f2fd',
+          color: '#000000', // Keep black text color on hover
+          backgroundColor: '#e0e0e0', // Light gray hover background
           textDecoration: 'none',
         },
       }}

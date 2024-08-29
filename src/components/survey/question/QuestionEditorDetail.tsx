@@ -12,7 +12,9 @@ const QuestionEditorDetail: React.FC = () => {
   if (!selectedQuestion) {
     return (
       <Box sx={{ padding: '2rem', textAlign: 'center' }}>
-        <Typography variant="h6">Select a question to edit</Typography>
+        <Typography variant="h6">
+          {questions.length === 0 ? 'Add a question to get started' : 'Select a question to edit'}
+        </Typography>
       </Box>
     );
   }
@@ -42,22 +44,29 @@ const QuestionEditorDetail: React.FC = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h6">Edit Question</Typography>
+    <Box
+      sx={{
+        padding: '2rem',
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+      }}
+    >
+      <Select value={selectedQuestion.type} onChange={handleTypeChange} fullWidth sx={{ marginBottom: '1rem' }}>
+        <MenuItem value={QuestionType.MultipleChoice}>Multiple Choice</MenuItem>
+        <MenuItem value={QuestionType.FillInTheBlank}>Fill in the Blank</MenuItem>
+        <MenuItem value={QuestionType.RatingScale}>Rating Scale</MenuItem>
+        <MenuItem value={QuestionType.Dropdown}>Dropdown</MenuItem>
+      </Select>
       <TextField
         label="Question Text"
         fullWidth
         value={selectedQuestion.text}
         onChange={handleTextChange}
         sx={{ marginBottom: '1rem' }}
+        multiline
+        rows={4} // Make it a textarea
       />
-      <Select value={selectedQuestion.type} onChange={handleTypeChange} fullWidth sx={{ marginBottom: '1rem' }}>
-        <MenuItem value={QuestionType.MultipleChoice}>Multiple Choice</MenuItem>
-        <MenuItem value={QuestionType.FillInTheBlank}>Fill in the Blank</MenuItem>
-        <MenuItem value={QuestionType.RatingScale}>Rating Scale</MenuItem>
-        <MenuItem value={QuestionType.Dropdown}>Dropdown</MenuItem>
-        {/* Add more question types as needed */}
-      </Select>
       {selectedQuestion.type === QuestionType.MultipleChoice && (
         <Box>
           {selectedQuestion.options?.map((option, index) => (
@@ -73,12 +82,12 @@ const QuestionEditorDetail: React.FC = () => {
               </Button>
             </Box>
           ))}
-          <Button onClick={handleAddOption} color="primary">
+          <Button onClick={handleAddOption} color="primary" sx={{ marginTop: '1rem' }}>
             Add Option
           </Button>
         </Box>
       )}
-      <Box sx={{ marginTop: '2rem' }}>
+      <Box sx={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           variant="contained"
           color="primary"

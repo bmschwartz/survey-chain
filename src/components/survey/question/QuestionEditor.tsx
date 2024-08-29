@@ -7,7 +7,7 @@ import QuestionEditorSidebar from './QuestionEditorSidebar';
 const QuestionEditor: React.FC = () => {
   return (
     <Grid2 container spacing={2}>
-      <Grid2 size={{ xs: 3 }}>
+      <Grid2 size={{ xs: 3 }} sx={{ height: '100vh', overflow: 'hidden' }}>
         <QuestionEditorSidebar />
       </Grid2>
       <Grid2 size={{ xs: 9 }}>

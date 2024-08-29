@@ -5,30 +5,32 @@ const theme = createTheme({
     fontFamily: 'Poppins, sans-serif',
     h4: {
       fontWeight: 600,
+      color: '#000000', // Dark color for headers
     },
     button: {
       fontWeight: 500,
       textTransform: 'none', // Avoid all-caps for buttons for a modern look
+      color: '#ffffff', // Default button text color (for contained buttons)
     },
     body1: {
       color: '#000000', // Set default text color to black
     },
   },
   palette: {
-    mode: 'light', // Default to light mode; can toggle to 'dark'
+    mode: 'light', // Light mode for a light background
     primary: {
-      main: '#0d47a1', // A nice deep blue for primary actions
+      main: '#000000', // Primary color as black (for buttons and other elements)
     },
     secondary: {
-      main: '#ff7043', // Accent color for secondary actions
+      main: '#555555', // Dark gray for secondary actions
     },
     background: {
-      default: '#f4f6f8', // Light gray background for a modern look
+      default: '#f7fafc', // Very light gray/blue background for the overall page
       paper: '#ffffff', // White background for cards and paper elements
     },
     text: {
-      primary: '#000000',
-      secondary: '#555555', // Softer black for secondary text
+      primary: '#000000', // Black text color
+      secondary: '#333333', // Dark gray for secondary text
     },
   },
   components: {
@@ -37,8 +39,12 @@ const theme = createTheme({
         root: {
           borderRadius: '8px', // Rounded buttons
           padding: '8px 16px', // Consistent padding
-          '&:hover': {
-            backgroundColor: '#1565c0', // Darker shade on hover for primary buttons
+          '&.MuiButton-contained': {
+            backgroundColor: '#000000', // Black background for contained buttons
+            color: '#ffffff', // White text color
+            '&:hover': {
+              backgroundColor: '#333333', // Slightly lighter shade of black on hover
+            },
           },
         },
       },
@@ -47,6 +53,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: '8px', // Consistent rounded corners on paper elements
+          backgroundColor: '#ffffff', // White background for paper elements (cards)
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', // Soft shadow for depth
         },
       },
@@ -55,6 +62,20 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           marginBottom: '1rem', // Consistent spacing between form elements
+          '& .MuiInputBase-input': {
+            color: '#000000', // Black text color for text fields
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: '#000000', // Black border for text fields
+            },
+            '&:hover fieldset': {
+              borderColor: '#333333', // Darker border on hover
+            },
+          },
+          '& .MuiInputLabel-root': {
+            color: '#000000', // Black label text color
+          },
         },
       },
     },
@@ -62,13 +83,23 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           padding: '20px 0', // Add some padding to the stepper
+          backgroundColor: 'transparent', // Transparent background to blend with the light theme
+          '& .MuiStepIcon-root': {
+            color: '#000000', // Black step icons
+          },
+          '& .MuiStepLabel-label': {
+            color: '#000000', // Black label text
+          },
         },
       },
     },
     MuiTypography: {
       styleOverrides: {
         h4: {
-          color: '#0d47a1', // Use primary color for h4 headers
+          color: '#000000', // Black color for h4 headers
+        },
+        body1: {
+          color: '#000000', // Black body text
         },
       },
     },

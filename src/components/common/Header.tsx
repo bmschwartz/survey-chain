@@ -26,8 +26,8 @@ const Header: React.FC = () => {
     <AppBar
       position="static"
       sx={{
-        background: '#ffffff',
-        color: '#000000',
+        background: '#ffffff', // White background for the header
+        color: '#000000', // Black text color for the header
         padding: '0 20px',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
       }}
@@ -41,7 +41,7 @@ const Header: React.FC = () => {
             sx={{
               cursor: 'pointer',
               fontWeight: 'bold',
-              color: '#000000', // Set text color to black
+              color: '#000000', // Black text color for the title
               fontFamily: 'Poppins, sans-serif', // Apply Poppins font
             }}
             onClick={() => handleNavigation('/home')}
@@ -64,7 +64,7 @@ const Header: React.FC = () => {
               paper: {
                 sx: {
                   backgroundColor: '#f5f5f5', // Light gray background for dropdown
-                  color: '#333', // Darker text color for better contrast
+                  color: '#000000', // Black text color for dropdown items
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
                   borderRadius: '8px', // Rounded corners for dropdown
                   minWidth: '150px',
@@ -77,7 +77,7 @@ const Header: React.FC = () => {
               sx={{
                 '&:hover': {
                   backgroundColor: '#e3f2fd', // Light blue hover effect
-                  color: '#0d47a1', // Dark blue text on hover
+                  color: '#000000', // Black text on hover
                 },
               }}
               onClick={() => handleNavigation('/surveys')}
@@ -88,7 +88,7 @@ const Header: React.FC = () => {
               sx={{
                 '&:hover': {
                   backgroundColor: '#e3f2fd', // Light blue hover effect
-                  color: '#0d47a1', // Dark blue text on hover
+                  color: '#000000', // Black text on hover
                 },
               }}
               onClick={() => handleNavigation('/surveys/create')}
@@ -99,7 +99,7 @@ const Header: React.FC = () => {
               sx={{
                 '&:hover': {
                   backgroundColor: '#e3f2fd', // Light blue hover effect
-                  color: '#0d47a1', // Dark blue text on hover
+                  color: '#000000', // Black text on hover
                 },
               }}
               onClick={() => handleNavigation('/surveys/mine')}
