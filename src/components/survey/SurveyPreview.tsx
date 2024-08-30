@@ -16,6 +16,7 @@ const SurveyPreview: React.FC = () => {
 
   return (
     <div>
+      <Typography variant="h6">Review Your Survey:</Typography>
       <Typography variant="h5" align="center" sx={{ marginBottom: '1rem' }}>
         {title}
       </Typography>
