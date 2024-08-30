@@ -32,6 +32,15 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
   const hasLocalChanges = !isEqual(initialQuestion, localQuestion);
 
   useEffect(() => {
+    if (!question || !initialQuestion) {
+      return;
+    }
+    if (question.id && question.id !== initialQuestion.id) {
+      setInitialQuestion(question);
+    }
+  }, [question, initialQuestion]);
+
+  useEffect(() => {
     // Ensure there's at least one empty option for MultipleChoice or Dropdown
     if (
       (localQuestion.type === QuestionType.MultipleChoice || localQuestion.type === QuestionType.Dropdown) &&
