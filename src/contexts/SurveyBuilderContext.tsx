@@ -1,25 +1,27 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
+import useSWR, { mutate } from 'swr';
 
+import { fetcher } from '@/utils/fetcher';
 import { Question, QuestionType } from '../types';
 
 interface SurveyBuilderContextType {
   activeStep: number;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-
   title: string;
   description: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
-
   questions: Question[];
   selectedQuestion: Question | null;
   isAddingNewQuestion: boolean;
+
   addQuestion: (newQuestion: Question) => void;
   updateQuestion: (updatedQuestion: Question) => void;
   deleteQuestion: (id: number) => void;
   selectQuestion: (id: number | null) => void;
   resetNewQuestion: () => Question;
   resetSurvey: () => void;
+  saveSurvey: () => Promise<void>;
   setIsAddingNewQuestion: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -35,15 +37,32 @@ export const useSurveyBuilder = () => {
 
 interface SurveyBuilderProviderProps {
   children: ReactNode;
+  surveyId?: string;
 }
 
-export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ children }) => {
+interface SurveyDataResponse {
+  title: string;
+  description: string;
+  questions: Question[];
+}
+
+export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ children, surveyId }) => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAddingNewQuestion, setIsAddingNewQuestion] = useState<boolean>(true);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+
+  const { data: survey } = useSWR<SurveyDataResponse>(surveyId ? `/api/surveys/${surveyId}` : null, fetcher, {
+    onSuccess: (data) => {
+      setTitle(data.title);
+      setDescription(data.description);
+      setQuestions(data.questions);
+    },
+  });
+
+  console.log('[DEBUG] fetched survey:', survey);
 
   const resetSurvey = () => {
     setTitle('');
@@ -90,8 +109,40 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
       setSelectedQuestion(null);
       return;
     }
+
     setIsAddingNewQuestion(false);
     setSelectedQuestion(questions.find((q) => q.id === id) || null);
+  };
+
+  const saveSurvey = async () => {
+    const surveyData = {
+      title,
+      description,
+      questions,
+      isPublished: false,
+    };
+
+    console.log('Saving survey:', surveyData);
+
+    const response = await fetch(`/api/surveys/${surveyId || ''}`, {
+      method: surveyId ? 'PUT' : 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(surveyData),
+    });
+
+    console.log('Save survey response:', response);
+    if (response.ok) {
+      const savedSurvey = await response.json();
+      console.log('Saved survey:', savedSurvey);
+      if (surveyData.isPublished) {
+        console.log('Survey published:', savedSurvey);
+      }
+
+      console.log('Mutating survey data');
+      mutate(`/api/surveys/${savedSurvey.id}`); // Revalidate survey data
+    }
   };
 
   return (
@@ -113,6 +164,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
         selectQuestion,
         resetNewQuestion,
         resetSurvey,
+        saveSurvey,
       }}
     >
       {children}

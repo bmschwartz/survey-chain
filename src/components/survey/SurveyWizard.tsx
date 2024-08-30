@@ -7,8 +7,13 @@ import SurveyStep from './SurveyStep';
 const steps = ['Basic Information', 'Add Questions', 'Preview & Save'];
 
 const SurveyWizard: React.FC = () => {
-  const { activeStep, setActiveStep, resetSurvey } = useSurveyBuilder();
-  const handleNext = () => {
+  const { activeStep, saveSurvey, setActiveStep, resetSurvey } = useSurveyBuilder();
+  const handleNext = async () => {
+    if (activeStep === steps.length - 1) {
+      console.log('Save the survey');
+      await saveSurvey();
+      return;
+    }
     setActiveStep((prevStep) => prevStep + 1);
   };
 
