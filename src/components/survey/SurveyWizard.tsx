@@ -2,7 +2,6 @@ import { Box, Button, Container, Step, StepLabel, Stepper, Typography } from '@m
 import React from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
-import SurveyPreview from './SurveyPreview';
 import SurveyStep from './SurveyStep';
 
 const steps = ['Basic Information', 'Add Questions', 'Preview & Save'];
@@ -48,7 +47,6 @@ const SurveyWizard: React.FC = () => {
       ) : (
         <>
           <SurveyStep />
-          {isLastStep && <SurveyPreview />}
           <Box
             sx={{
               marginTop: '2rem',
@@ -62,7 +60,7 @@ const SurveyWizard: React.FC = () => {
               Back
             </Button>
             <Button variant="contained" color="primary" onClick={handleNext}>
-              {isLastStep ? 'Finish' : 'Next'}
+              {isLastStep ? 'Save' : 'Next'}
             </Button>
           </Box>
         </>

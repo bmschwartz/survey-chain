@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
 import QuestionEditor from './question/QuestionEditor';
+import SurveyPreview from './SurveyPreview';
 
 const SurveyStep: React.FC = () => {
   const { activeStep, title, description, setTitle, setDescription } = useSurveyBuilder();
@@ -43,7 +44,7 @@ const SurveyStep: React.FC = () => {
       return (
         <Box>
           <Typography variant="h6">Review Your Survey:</Typography>
-          {/* Detailed preview or summary of the survey */}
+          <SurveyPreview />
         </Box>
       );
     default:
