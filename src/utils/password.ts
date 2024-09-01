@@ -1,5 +1,3 @@
-import bcrypt from 'bcrypt';
-
 const SALT_ROUNDS = 10; // Adjust the number of salt rounds as needed
 
 /**
@@ -9,6 +7,7 @@ const SALT_ROUNDS = 10; // Adjust the number of salt rounds as needed
  * @returns The salted and hashed password.
  */
 export async function saltAndHashPassword(password: string): Promise<string> {
+  const bcrypt = await import('bcrypt');
   // Generate a salt
   const salt = await bcrypt.genSalt(SALT_ROUNDS);
 

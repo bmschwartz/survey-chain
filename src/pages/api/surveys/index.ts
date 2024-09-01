@@ -1,21 +1,24 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react';
+
+// import { getSession } from 'next-auth/react';
 
 import { prisma } from '@/services/prisma';
 
 const validateSurvey = (surveyData: any) => {
+  console.log('surveyData', surveyData);
   return true;
 };
 
 const handleSaveFinish = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const session = await getSession();
+    // const session = await getSession();
 
-    if (!session) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+    // if (!session?.user) {
+    //   return res.status(401).json({ message: 'Unauthorized' });
+    // }
 
-    const userId = session.user.id;
+    // const userId = session.user.id;
+    const userId = '1';
     const { surveyData } = req.body;
     const { title, description, isPublished } = surveyData;
 

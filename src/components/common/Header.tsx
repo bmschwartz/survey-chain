@@ -1,5 +1,7 @@
+// import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { ArrowDropDown as ArrowDropDownIcon, Login as LoginIcon } from '@mui/icons-material';
 import { AppBar, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import React, { MouseEvent, useState } from 'react';
 
@@ -110,9 +112,15 @@ const Header: React.FC = () => {
         </div>
 
         {/* Right-aligned Sign In button */}
-        <HeaderButton startIcon={<LoginIcon />} onClick={() => handleNavigation('/login')}>
-          Sign In
+        {/* <SignedIn>
+          <UserButton />
+        </SignedIn> */}
+        {/* <SignedOut> */}
+        {/* <HeaderButton startIcon={<LoginIcon />} onClick={() => handleNavigation('/sign-in')}> */}
+        <HeaderButton startIcon={<LoginIcon />} onClick={() => signIn()}>
+          Sign In / Register
         </HeaderButton>
+        {/* </SignedOut> */}
       </Toolbar>
     </AppBar>
   );

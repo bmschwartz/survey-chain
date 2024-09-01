@@ -4,7 +4,7 @@ import React from 'react';
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
 import SurveyStep from './SurveyStep';
 
-const steps = ['Basic Information', 'Add Questions', 'Preview & Save'];
+const steps = ['Basic Information', 'Add Questions', 'Review & Save'];
 
 const SurveyWizard: React.FC = () => {
   const { activeStep, saveSurvey, setActiveStep, resetSurvey } = useSurveyBuilder();
