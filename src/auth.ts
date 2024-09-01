@@ -5,14 +5,16 @@ import { ZodError } from 'zod';
 
 import { signInSchema } from '@/lib/zod';
 import { prisma } from '@/services/prisma';
-import { saltAndHashPassword } from '@/utils/password';
+import { comparePassword } from '@/utils/password';
 
 import type { DefaultSession } from 'next-auth';
 import type { Provider } from 'next-auth/providers';
 
 declare module 'next-auth' {
   interface Session {
-    user: {} & DefaultSession['user'];
+    user: {
+      displayName?: string;
+    } & DefaultSession['user'];
   }
 }
 
@@ -24,37 +26,23 @@ const providers: Provider[] = [
     },
     authorize: async (credentials) => {
       try {
-        console.log('DEBUG: credentials', credentials);
         if (!credentials) {
           return null;
         }
-        console.log('DEBUG parsed credentials', await signInSchema.parseAsync(credentials));
+
         const { email, password } = await signInSchema.parseAsync(credentials);
+        const user = await prisma.user.findUnique({ where: { email }, include: { credential: true } });
+        const isMatchingPassword = await comparePassword(password, user?.credential?.hashedPassword ?? '');
 
-        // logic to salt and hash password
-        const pwHash = await saltAndHashPassword(password);
-
-        const user = await prisma.user.findUnique({
-          where: {
-            email,
-            credential: {
-              hashedPassword: pwHash,
-            },
-          },
-        });
-
-        if (!user) {
-          console.log('DEBUG: User not found');
+        if (!user?.credential || !isMatchingPassword) {
           return null; // Explicitly return null if user not found
         }
-
-        console.log('DEBUG: User found', user);
 
         return {
           id: user.id,
           email: user.email,
-          name: user.name,
           image: user.image,
+          displayName: user.displayName,
         };
       } catch (error) {
         if (error instanceof ZodError) {

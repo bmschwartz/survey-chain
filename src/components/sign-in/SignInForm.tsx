@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Grid2, TextField, Typography } from '@mui/material';
 import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -12,6 +13,7 @@ type SignInFormData = {
 };
 
 const SignInForm: React.FC = () => {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -32,9 +34,14 @@ const SignInForm: React.FC = () => {
         redirect: false, // Prevent auto redirect, handle manually
       });
 
+      console.log('login result', result);
+
       if (result?.error) {
         setError('Invalid email or password');
+        return;
       }
+
+      router.push('/home');
     } catch {
       setError('An unexpected error occurred');
     }

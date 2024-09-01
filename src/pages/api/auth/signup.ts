@@ -16,18 +16,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { email, password, confirmPassword, displayName } = signUpSchema.parse(req.body);
 
     // Check if the user already exists
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          {
-            email,
-          },
-          {
-            displayName,
-          },
-        ],
-      },
-    });
+    const where = displayName ? { OR: [{ email }, { displayName }] } : { email };
+
+    const existingUser = await prisma.user.findFirst({ where });
 
     if (existingUser) {
       return res.status(400).json({ message: 'Email or Display Name already in use' });
@@ -36,7 +27,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords don't match" });
     }
-
     // Hash the password
     const hashedPassword = await saltAndHashPassword(password);
 

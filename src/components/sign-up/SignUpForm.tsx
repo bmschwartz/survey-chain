@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Grid2, TextField, Typography } from '@mui/material';
 import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
@@ -10,10 +11,11 @@ type SignUpFormData = {
   email: string;
   password: string;
   confirmPassword: string;
-  displayName: string;
+  displayName?: string;
 };
 
 const SignUpForm: React.FC = () => {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -37,6 +39,8 @@ const SignUpForm: React.FC = () => {
         body: JSON.stringify({
           email: data.email,
           password: data.password,
+          displayName: data.displayName,
+          confirmPassword: data.confirmPassword,
         }),
       });
 
@@ -47,6 +51,8 @@ const SignUpForm: React.FC = () => {
           password: data.password,
           redirect: false, // Prevent auto redirect, handle manually
         });
+
+        router.push('/home');
       } else {
         setError('Failed to sign up. Please try again.');
       }

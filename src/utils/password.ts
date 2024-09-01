@@ -16,3 +16,15 @@ export async function saltAndHashPassword(password: string): Promise<string> {
 
   return hashedPassword;
 }
+
+/**
+ * Compares a plain text password with a stored hashed password.
+ *
+ * @param password - The plain text password to check.
+ * @param hashedPassword - The hashed password stored in the database.
+ * @returns Whether the password matches the hash.
+ */
+export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+  const bcrypt = await import('bcrypt');
+  return bcrypt.compare(password, hashedPassword);
+}
