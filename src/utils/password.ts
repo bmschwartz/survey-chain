@@ -7,7 +7,7 @@ const SALT_ROUNDS = 10; // Adjust the number of salt rounds as needed
  * @returns The salted and hashed password.
  */
 export async function saltAndHashPassword(password: string): Promise<string> {
-  const bcrypt = await import('bcrypt');
+  const bcrypt = await import('bcryptjs');
   // Generate a salt
   const salt = await bcrypt.genSalt(SALT_ROUNDS);
 
@@ -25,6 +25,6 @@ export async function saltAndHashPassword(password: string): Promise<string> {
  * @returns Whether the password matches the hash.
  */
 export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
-  const bcrypt = await import('bcrypt');
+  const bcrypt = await import('bcryptjs');
   return bcrypt.compare(password, hashedPassword);
 }

@@ -1,7 +1,7 @@
 // import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { ArrowDropDown as ArrowDropDownIcon, Login as LoginIcon } from '@mui/icons-material';
 import { AppBar, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import React, { MouseEvent, useState } from 'react';
 
@@ -10,6 +10,9 @@ import HeaderButton from './HeaderButton';
 const Header: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const router = useRouter();
+  const { data: session } = useSession();
+
+  console.log('session', session);
 
   const handleMenuClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -111,15 +114,13 @@ const Header: React.FC = () => {
           </Menu>
         </div>
 
-        {/* Right-aligned Sign In button */}
-        {/* <SignedIn>
-          <UserButton />
-        </SignedIn> */}
-        {/* <SignedOut> */}
-        {/* <HeaderButton startIcon={<LoginIcon />} onClick={() => handleNavigation('/sign-in')}> */}
-        <HeaderButton startIcon={<LoginIcon />} onClick={() => signIn()}>
-          Sign In / Register
-        </HeaderButton>
+        {session?.user ? (
+          <div>Hey!</div>
+        ) : (
+          <HeaderButton startIcon={<LoginIcon />} onClick={() => signIn()}>
+            Sign In / Register
+          </HeaderButton>
+        )}
         {/* </SignedOut> */}
       </Toolbar>
     </AppBar>
