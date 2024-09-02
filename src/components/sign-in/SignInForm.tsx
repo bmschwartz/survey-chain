@@ -10,6 +10,7 @@ import { signInSchema } from '@/lib/zod';
 type SignInFormData = {
   email: string;
   password: string;
+  displayName: string;
 };
 
 const SignInForm: React.FC = () => {

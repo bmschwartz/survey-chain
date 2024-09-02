@@ -25,7 +25,6 @@ const providers: Provider[] = [
       password: { label: 'Password', type: 'password' },
     },
     authorize: async (credentials) => {
-      console.log('DEBUG inside authorize', credentials);
       try {
         if (!credentials) {
           return null;
@@ -36,16 +35,11 @@ const providers: Provider[] = [
         const isMatchingPassword = await comparePassword(password, user?.credential?.hashedPassword ?? '');
 
         if (!user?.credential || !isMatchingPassword) {
-          console.log('DEBUG returning null from authorize', user?.credential, isMatchingPassword);
           return null; // Explicitly return null if user not found
         }
 
-        console.log('DEBUG returning user from authorize', {
-          id: user.id,
-          email: user.email,
-          image: user.image,
-          displayName: user.displayName,
-        });
+        console.log('DEBUG user', user);
+
         return {
           id: user.id,
           email: user.email,
@@ -57,34 +51,34 @@ const providers: Provider[] = [
           return null; // Explicitly return null on validation error
         }
 
-        console.error('Authorization error:', error);
         return null; // Return null on any other errors
       }
     },
   }),
 ];
 
-// export const providerMap = providers
-//   .map((provider) => {
-//     if (typeof provider === 'function') {
-//       const providerData = provider();
-//       return { id: providerData.id, name: providerData.name };
-//     } else {
-//       console.log('DEBUG provider', provider);
-//       return { id: provider.id, name: provider.name };
-//     }
-//   })
-//   .filter((provider) => provider.id !== 'credentials');
+export const providerMap = providers
+  .map((provider) => {
+    if (typeof provider === 'function') {
+      const providerData = provider();
+      return { id: providerData.id, name: providerData.name };
+    } else {
+      return { id: provider.id, name: provider.name };
+    }
+  })
+  .filter((provider) => provider.id !== 'credentials');
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   callbacks: {
-    authorized: async ({ auth, request }) => {
-      console.log('DEBUG: authorized', auth, request.url);
+    authorized: async ({ auth }) => {
       return !!auth;
     },
   },
   providers,
+  session: {
+    strategy: 'jwt',
+  },
   pages: {
     signIn: '/sign-in',
   },

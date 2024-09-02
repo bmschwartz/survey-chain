@@ -1,29 +1,37 @@
 // import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { ArrowDropDown as ArrowDropDownIcon, Login as LoginIcon } from '@mui/icons-material';
 import { AppBar, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import React, { MouseEvent, useState } from 'react';
 
 import HeaderButton from './HeaderButton';
 
 const Header: React.FC = () => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [surveyMenuAnchorEl, setSurveyMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<HTMLElement | null>(null);
   const router = useRouter();
   const { data: session } = useSession();
 
-  console.log('session', session);
-
-  const handleMenuClick = (event: MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const handleSurveyMenuClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setSurveyMenuAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleSurveyMenuClose = () => {
+    setSurveyMenuAnchorEl(null);
+  };
+
+  const handleUserMenuClick = (event: MouseEvent<HTMLButtonElement>) => {
+    setUserMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchorEl(null);
   };
 
   const handleNavigation = (path: string) => {
-    handleMenuClose();
+    handleSurveyMenuClose();
+    handleUserMenuClose();
     router.push(path);
   };
 
@@ -55,13 +63,13 @@ const Header: React.FC = () => {
           </Typography>
 
           <HeaderButton onClick={() => handleNavigation('/home')}>Home</HeaderButton>
-          <HeaderButton endIcon={<ArrowDropDownIcon />} onClick={handleMenuClick}>
+          <HeaderButton endIcon={<ArrowDropDownIcon />} onClick={handleSurveyMenuClick}>
             Surveys
           </HeaderButton>
           <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
+            anchorEl={surveyMenuAnchorEl}
+            open={Boolean(surveyMenuAnchorEl)}
+            onClose={handleSurveyMenuClose}
             MenuListProps={{
               'aria-labelledby': 'basic-button',
             }}
@@ -115,7 +123,43 @@ const Header: React.FC = () => {
         </div>
 
         {session?.user ? (
-          <div>Hey!</div>
+          <>
+            <HeaderButton endIcon={<ArrowDropDownIcon />} onClick={handleUserMenuClick}>
+              {session.user.displayName || session.user.email}
+            </HeaderButton>
+            <Menu
+              anchorEl={userMenuAnchorEl}
+              open={Boolean(userMenuAnchorEl)}
+              onClose={handleUserMenuClose}
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+              slotProps={{
+                paper: {
+                  sx: {
+                    backgroundColor: '#f5f5f5', // Light gray background for dropdown
+                    color: '#000000', // Black text color for dropdown items
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+                    borderRadius: '8px', // Rounded corners for dropdown
+                    minWidth: '150px',
+                    mt: 1,
+                  },
+                },
+              }}
+            >
+              <MenuItem
+                sx={{
+                  '&:hover': {
+                    backgroundColor: '#e3f2fd', // Light blue hover effect
+                    color: '#000000', // Black text on hover
+                  },
+                }}
+                onClick={() => signOut({ callbackUrl: '/' })}
+              >
+                Logout
+              </MenuItem>
+            </Menu>
+          </>
         ) : (
           <HeaderButton startIcon={<LoginIcon />} onClick={() => signIn()}>
             Sign In / Register
