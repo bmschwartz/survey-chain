@@ -93,7 +93,7 @@ const Header: React.FC = () => {
                   color: '#000000', // Black text on hover
                 },
               }}
-              onClick={() => handleNavigation('/surveys')}
+              onClick={() => handleNavigation('/surveys/list?tab=explore')}
             >
               Explore Surveys
             </MenuItem>
@@ -115,7 +115,7 @@ const Header: React.FC = () => {
                   color: '#000000', // Black text on hover
                 },
               }}
-              onClick={() => handleNavigation('/surveys/mine')}
+              onClick={() => handleNavigation('/surveys/list?tab=my-surveys')}
             >
               My Surveys
             </MenuItem>

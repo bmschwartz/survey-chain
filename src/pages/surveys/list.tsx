@@ -2,16 +2,16 @@ import { GetServerSidePropsContext } from 'next';
 import React from 'react';
 
 import { auth } from '@/auth';
-import HomeView from '@/views/home/HomeView';
+import SurveyListView from '@/views/survey-list/SurveyListView';
 
-const HomePage = () => {
-  return <HomeView />;
+const SurveyListPage: React.FC = () => {
+  return <SurveyListView />;
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const session = await auth(ctx);
 
-  console.log('home session', session);
+  console.log('survey list session', session);
   return {
     props: {
       session,
@@ -19,4 +19,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export default HomePage;
+export default SurveyListPage;

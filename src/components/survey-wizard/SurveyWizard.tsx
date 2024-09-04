@@ -24,9 +24,6 @@ const SurveyWizard: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ marginTop: '2rem' }}>
-      <Typography variant="h4" sx={{ marginBottom: '2rem', textAlign: 'center' }}>
-        Create a New Survey
-      </Typography>
       <Stepper activeStep={activeStep} sx={{ marginBottom: '2rem' }}>
         {steps.map((label) => (
           <Step key={label}>
