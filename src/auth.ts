@@ -38,8 +38,6 @@ const providers: Provider[] = [
           return null; // Explicitly return null if user not found
         }
 
-        console.log('DEBUG user', user);
-
         return {
           id: user.id,
           email: user.email,

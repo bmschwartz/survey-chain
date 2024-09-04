@@ -62,7 +62,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     },
   });
 
-  console.log('[DEBUG] fetched survey:', survey);
+  console.log('DEBUG survey from useSWR:', survey);
 
   const resetSurvey = () => {
     setTitle('');

@@ -35,8 +35,6 @@ const SignInForm: React.FC = () => {
         redirect: false, // Prevent auto redirect, handle manually
       });
 
-      console.log('login result', result);
-
       if (result?.error) {
         setError('Invalid email or password');
         return;

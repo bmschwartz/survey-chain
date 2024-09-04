@@ -9,9 +9,8 @@ const HomePage = () => {
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  console.log('getting session');
   const session = await auth(ctx);
-  console.log('got session', session);
+
   return {
     props: {
       session,

@@ -10,7 +10,6 @@ const SurveyWizard: React.FC = () => {
   const { activeStep, saveSurvey, setActiveStep, resetSurvey } = useSurveyBuilder();
   const handleNext = async () => {
     if (activeStep === steps.length - 1) {
-      console.log('Save the survey');
       await saveSurvey();
       return;
     }

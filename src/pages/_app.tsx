@@ -24,7 +24,7 @@ type AppPropsWithLayout = AppProps & {
 
 export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || ((page) => <MainLayout>{page}</MainLayout>);
-  console.log('pageProps', pageProps);
+
   return (
     <SessionProvider session={pageProps.session}>
       <ThemeProvider theme={theme}>
