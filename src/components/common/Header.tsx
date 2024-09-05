@@ -1,4 +1,3 @@
-// import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { ArrowDropDown as ArrowDropDownIcon, Login as LoginIcon } from '@mui/icons-material';
 import { AppBar, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import { signIn, signOut, useSession } from 'next-auth/react';
@@ -8,18 +7,9 @@ import React, { MouseEvent, useState } from 'react';
 import HeaderButton from './HeaderButton';
 
 const Header: React.FC = () => {
-  const [surveyMenuAnchorEl, setSurveyMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<HTMLElement | null>(null);
   const router = useRouter();
   const { data: session } = useSession();
-
-  const handleSurveyMenuClick = (event: MouseEvent<HTMLButtonElement>) => {
-    setSurveyMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleSurveyMenuClose = () => {
-    setSurveyMenuAnchorEl(null);
-  };
 
   const handleUserMenuClick = (event: MouseEvent<HTMLButtonElement>) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -30,7 +20,6 @@ const Header: React.FC = () => {
   };
 
   const handleNavigation = (path: string) => {
-    handleSurveyMenuClose();
     handleUserMenuClose();
     router.push(path);
   };
@@ -61,65 +50,9 @@ const Header: React.FC = () => {
           >
             SurveyChain
           </Typography>
-
           <HeaderButton onClick={() => handleNavigation('/home')}>Home</HeaderButton>
-          <HeaderButton endIcon={<ArrowDropDownIcon />} onClick={handleSurveyMenuClick}>
-            Surveys
-          </HeaderButton>
-          <Menu
-            anchorEl={surveyMenuAnchorEl}
-            open={Boolean(surveyMenuAnchorEl)}
-            onClose={handleSurveyMenuClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-            slotProps={{
-              paper: {
-                sx: {
-                  backgroundColor: '#f5f5f5', // Light gray background for dropdown
-                  color: '#000000', // Black text color for dropdown items
-                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
-                  borderRadius: '8px', // Rounded corners for dropdown
-                  minWidth: '150px',
-                  mt: 1,
-                },
-              },
-            }}
-          >
-            <MenuItem
-              sx={{
-                '&:hover': {
-                  backgroundColor: '#e3f2fd', // Light blue hover effect
-                  color: '#000000', // Black text on hover
-                },
-              }}
-              onClick={() => handleNavigation('/surveys/list?tab=explore')}
-            >
-              Explore Surveys
-            </MenuItem>
-            <MenuItem
-              sx={{
-                '&:hover': {
-                  backgroundColor: '#e3f2fd', // Light blue hover effect
-                  color: '#000000', // Black text on hover
-                },
-              }}
-              onClick={() => handleNavigation('/surveys/create')}
-            >
-              New Survey
-            </MenuItem>
-            <MenuItem
-              sx={{
-                '&:hover': {
-                  backgroundColor: '#e3f2fd', // Light blue hover effect
-                  color: '#000000', // Black text on hover
-                },
-              }}
-              onClick={() => handleNavigation('/surveys/list?tab=my-surveys')}
-            >
-              My Surveys
-            </MenuItem>
-          </Menu>
+          <HeaderButton onClick={() => handleNavigation('/surveys/list')}>Explore</HeaderButton>
+          <HeaderButton onClick={() => handleNavigation('/surveys/my-surveys')}>My Surveys</HeaderButton>
         </div>
 
         {session?.user ? (

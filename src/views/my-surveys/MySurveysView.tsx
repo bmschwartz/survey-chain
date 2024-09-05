@@ -3,15 +3,15 @@ import React from 'react';
 
 import SurveyGrid from '@/components/survey-list/SurveyGrid';
 
-const SurveyListView: React.FC = () => {
+const MySurveysView: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ marginTop: '2rem' }}>
       <Typography variant="h4" sx={{ marginBottom: '2rem', textAlign: 'center' }}>
-        Explore Surveys
+        My Surveys
       </Typography>
       <SurveyGrid />
     </Container>
   );
 };
 
-export default SurveyListView;
+export default MySurveysView;
