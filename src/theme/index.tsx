@@ -4,91 +4,72 @@ const theme = createTheme({
   typography: {
     fontFamily: 'Poppins, sans-serif',
     h4: {
-      fontWeight: 600,
-      color: '#000000', // Dark color for headers
+      fontWeight: 700,
+      color: '#0D1B2A',
     },
     button: {
       fontWeight: 500,
-      textTransform: 'none', // Avoid all-caps for buttons for a modern look
-      color: '#ffffff', // Default button text color (for contained buttons)
+      textTransform: 'none',
+      color: '#ffffff',
     },
     body1: {
-      color: '#000000', // Set default text color to black
+      color: '#1B263B',
+    },
+    body2: {
+      color: '#3E4C59',
     },
   },
   palette: {
-    mode: 'light', // Light mode for a light background
+    mode: 'light',
     primary: {
-      main: '#000000', // Primary color as black (for buttons and other elements)
+      main: '#0D3B66',
     },
     secondary: {
-      main: '#555555', // Dark gray for secondary actions
+      main: '#555555',
     },
     background: {
-      default: '#f7fafc', // Very light gray/blue background for the overall page
-      paper: '#ffffff', // White background for cards and paper elements
+      default: '#f7fafc',
+      paper: '#ffffff',
     },
     text: {
-      primary: '#000000', // Black text color
-      secondary: '#333333', // Dark gray for secondary text
+      primary: '#0D1B2A',
+      secondary: '#333333',
     },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: '8px', // Rounded buttons
-          padding: '8px 16px', // Consistent padding
+          borderRadius: '8px',
+          padding: '8px 16px',
+          transition: 'all 0.3s ease',
           '&.MuiButton-contained': {
-            backgroundColor: '#000000', // Black background for contained buttons
-            color: '#ffffff', // White text color
+            backgroundColor: '#0D3B66',
+            color: '#ffffff',
             '&:hover': {
-              backgroundColor: '#333333', // Slightly lighter shade of black on hover
+              backgroundColor: '#1B8ED1',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            },
+          },
+          '&.MuiButton-outlined': {
+            borderColor: '#0D3B66',
+            color: '#0D3B66',
+            '&:hover': {
+              backgroundColor: 'rgba(13, 59, 102, 0.1)',
             },
           },
         },
       },
     },
-    MuiPaper: {
+    MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: '8px', // Consistent rounded corners on paper elements
-          backgroundColor: '#ffffff', // White background for paper elements (cards)
-          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', // Soft shadow for depth
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          marginBottom: '1rem', // Consistent spacing between form elements
-          '& .MuiInputBase-input': {
-            color: '#000000', // Black text color for text fields
-          },
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: '#000000', // Black border for text fields
-            },
-            '&:hover fieldset': {
-              borderColor: '#333333', // Darker border on hover
-            },
-          },
-          '& .MuiInputLabel-root': {
-            color: '#000000', // Black label text color
-          },
-        },
-      },
-    },
-    MuiStepper: {
-      styleOverrides: {
-        root: {
-          padding: '20px 0', // Add some padding to the stepper
-          backgroundColor: 'transparent', // Transparent background to blend with the light theme
-          '& .MuiStepIcon-root': {
-            color: '#000000', // Black step icons
-          },
-          '& .MuiStepLabel-label': {
-            color: '#000000', // Black label text
+          borderRadius: '12px',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
           },
         },
       },
@@ -96,10 +77,10 @@ const theme = createTheme({
     MuiTypography: {
       styleOverrides: {
         h4: {
-          color: '#000000', // Black color for h4 headers
+          color: '#0D1B2A',
         },
         body1: {
-          color: '#000000', // Black body text
+          color: '#1B263B',
         },
       },
     },

@@ -1,28 +1,34 @@
 import { Button } from '@mui/material';
 
 interface HeaderButtonProps {
+  isActive?: boolean;
   children: React.ReactNode;
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const HeaderButton: React.FC<HeaderButtonProps> = ({ onClick, startIcon, children, endIcon }) => {
+const HeaderButton: React.FC<HeaderButtonProps> = ({ onClick, isActive = false, startIcon, children, endIcon }) => {
   return (
     <Button
       startIcon={startIcon}
       endIcon={endIcon}
       sx={{
-        color: '#000000', // Black text color
-        fontSize: '1.2rem',
+        color: '#0D3B66', // Updated to primary blue color
+        fontSize: '1.1rem',
+        fontWeight: 500,
         marginLeft: '20px',
-        borderRadius: '8px',
         padding: '8px 16px',
         fontFamily: 'Poppins, sans-serif',
-        backgroundColor: '#ffffff', // White background
+        backgroundColor: 'transparent', // Transparent background for header buttons
+        transition: 'all 0.3s ease',
+        borderRadius: '8px',
+        borderBottomLeftRadius: isActive ? '0' : '8px',
+        borderBottomRightRadius: isActive ? '0' : '8px',
+        borderBottom: isActive ? '2px solid #0D3B66' : 'none',
         '&:hover': {
-          color: '#000000', // Keep black text color on hover
-          backgroundColor: '#e0e0e0', // Light gray hover background
+          color: '#1B8ED1', // Lighter blue text color on hover
+          backgroundColor: '#f0f4f8', // Soft background color on hover
           textDecoration: 'none',
         },
       }}

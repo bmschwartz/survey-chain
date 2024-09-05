@@ -3,6 +3,7 @@ import React from 'react';
 
 import SurveyCard from './SurveyCard';
 
+// Dummy survey data for now
 const surveyData = [
   {
     id: '1',
@@ -23,7 +24,7 @@ const surveyData = [
 
 const SurveyGrid: React.FC = () => {
   return (
-    <Grid container spacing={4}>
+    <Grid container spacing={4} sx={{ marginTop: '2rem' }}>
       {surveyData.map((survey) => (
         <Grid item xs={12} sm={6} md={4} key={survey.id}>
           <SurveyCard survey={survey} />
