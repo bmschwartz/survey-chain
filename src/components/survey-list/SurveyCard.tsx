@@ -7,7 +7,7 @@ interface SurveyCardProps {
     title: string;
     description: string;
     creator: string;
-    responses: number;
+    questions: number;
   };
 }
 
@@ -25,21 +25,21 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
       }}
     >
       <CardContent>
-        <Typography variant="h6" component="div" gutterBottom>
-          {survey.title}
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          {survey.title.length > 40 ? `${survey.title.slice(0, 40)}...` : survey.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ marginBottom: '1rem' }}>
-          {survey.description}
+          {survey.description.length > 40 ? `${survey.description.slice(0, 40)}...` : survey.description}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Created by: {survey.creator}
+        <Typography variant="caption" color="text.secondary">
+          Creator: {survey.creator}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Responses: {survey.responses}
+        <Typography variant="caption" color="text.secondary" sx={{ marginLeft: '1rem' }}>
+          Questions: {survey.questions}
         </Typography>
       </CardContent>
 
-      <Divider sx={{ borderWidth: 1, marginY: 1 }} />
+      <Divider sx={{ borderWidth: 1 }} />
 
       <CardActions sx={{ marginBottom: 1 }}>
         <Box sx={{ margin: 'auto' }}>
