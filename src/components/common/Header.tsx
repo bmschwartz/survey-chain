@@ -98,7 +98,7 @@ const Header: React.FC = () => {
                     color: '#000000',
                   },
                 }}
-                onClick={() => signOut({ callbackUrl: '/' })}
+                onClick={() => signOut({ callbackUrl: '/home' })}
               >
                 Logout
               </MenuItem>

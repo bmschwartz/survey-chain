@@ -4,6 +4,8 @@ import useSWR, { mutate } from 'swr';
 import { fetcher } from '@/utils/fetcher';
 import { Question, QuestionType } from '../types';
 
+type ValidationError = string;
+
 interface SurveyBuilderContextType {
   activeStep: number;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
@@ -14,6 +16,7 @@ interface SurveyBuilderContextType {
   questions: Question[];
   selectedQuestion: Question | null;
   isAddingNewQuestion: boolean;
+  validationErrors: ValidationError[];
 
   addQuestion: (newQuestion: Question) => void;
   updateQuestion: (updatedQuestion: Question) => void;
@@ -23,6 +26,8 @@ interface SurveyBuilderContextType {
   resetSurvey: () => void;
   saveSurvey: () => Promise<void>;
   setIsAddingNewQuestion: React.Dispatch<React.SetStateAction<boolean>>;
+
+  validateStep: () => Promise<ValidationError[]>;
 }
 
 const SurveyBuilderContext = createContext<SurveyBuilderContextType | undefined>(undefined);
@@ -53,6 +58,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAddingNewQuestion, setIsAddingNewQuestion] = useState<boolean>(true);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const { data: survey } = useSWR<SurveyDataResponse>(surveyId ? `/api/surveys/${surveyId}` : null, fetcher, {
     onSuccess: (data) => {
@@ -62,7 +68,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     },
   });
 
-  console.log('DEBUG survey from useSWR:', survey);
+  console.log('Debug survey', survey);
 
   const resetSurvey = () => {
     setTitle('');
@@ -114,6 +120,56 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     setSelectedQuestion(questions.find((q) => q.id === id) || null);
   };
 
+  const validateBasicInformation = (): ValidationError[] => {
+    const validationErrors: ValidationError[] = [];
+    if (title.trim().length < 5) {
+      validationErrors.push('Title must be at least 5 characters');
+    }
+    if (description.trim().length < 5) {
+      validationErrors.push('Description must be at least 5 characters');
+    }
+
+    return validationErrors;
+  };
+
+  const validateQuestionEditor = (): ValidationError[] => {
+    const validationErrors: ValidationError[] = [];
+    if (questions.length === 0) {
+      validationErrors.push('Please add at least one question');
+    }
+    if (questions.some((q) => q.text.trim() === '')) {
+      validationErrors.push('Please fill out all question text fields');
+    }
+
+    return validationErrors;
+  };
+
+  const validateSurveyPreview = (): ValidationError[] => {
+    return [];
+  };
+
+  const validateStep = async (): Promise<ValidationError[]> => {
+    let errors: ValidationError[] = [];
+
+    switch (activeStep) {
+      case 0:
+        errors = validateBasicInformation();
+        break;
+      case 1:
+        errors = validateQuestionEditor();
+        break;
+      case 2:
+        errors = validateSurveyPreview();
+        break;
+      default:
+        errors = [];
+        break;
+    }
+
+    setValidationErrors(errors);
+    return errors;
+  };
+
   const saveSurvey = async () => {
     const surveyData = {
       title,
@@ -121,8 +177,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
       questions,
       isPublished: false,
     };
-
-    console.log('Saving survey:', surveyData);
 
     const response = await fetch(`/api/surveys/${surveyId || ''}`, {
       method: surveyId ? 'PUT' : 'POST',
@@ -132,15 +186,8 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
       body: JSON.stringify(surveyData),
     });
 
-    console.log('Save survey response:', response);
     if (response.ok) {
       const savedSurvey = await response.json();
-      console.log('Saved survey:', savedSurvey);
-      if (surveyData.isPublished) {
-        console.log('Survey published:', savedSurvey);
-      }
-
-      console.log('Mutating survey data');
       mutate(`/api/surveys/${savedSurvey.id}`); // Revalidate survey data
     }
   };
@@ -152,6 +199,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
         title,
         description,
         questions,
+        validationErrors,
         selectedQuestion,
         isAddingNewQuestion,
         setIsAddingNewQuestion,
@@ -165,6 +213,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
         resetNewQuestion,
         resetSurvey,
         saveSurvey,
+        validateStep,
       }}
     >
       {children}

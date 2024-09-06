@@ -1,5 +1,5 @@
 import { Box, Button, Container, Step, StepLabel, Stepper, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
 import SurveyStep from './SurveyStep';
@@ -7,12 +7,22 @@ import SurveyStep from './SurveyStep';
 const steps = ['Basic Information', 'Add Questions', 'Review & Save'];
 
 const SurveyWizard: React.FC = () => {
-  const { activeStep, saveSurvey, setActiveStep, resetSurvey } = useSurveyBuilder();
+  const { activeStep, saveSurvey, setActiveStep, resetSurvey, validateStep, validationErrors } = useSurveyBuilder();
+  // const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
   const handleNext = async () => {
+    const errors = await validateStep();
+    console.log('Debug errors', errors);
+    if (errors.length > 0) {
+      console.log('Debug errors', errors);
+      // setValidationErrors(errors);
+      return;
+    }
     if (activeStep === steps.length - 1) {
       await saveSurvey();
       return;
     }
+    console.log('Debug activeStep', activeStep);
     setActiveStep((prevStep) => prevStep + 1);
   };
 
@@ -48,13 +58,23 @@ const SurveyWizard: React.FC = () => {
       ) : (
         <>
           <SurveyStep />
+          {validationErrors.length > 0 && (
+            <Box sx={{ marginTop: '2rem', marginBottom: '1rem' }}>
+              {validationErrors.map((error, index) => (
+                <Typography key={index} sx={{ color: 'red' }}>
+                  {error}
+                </Typography>
+              ))}
+            </Box>
+          )}
+
           <Box
             sx={{
               marginTop: '2rem',
               textAlign: 'center',
-              display: 'flex', // Use flexbox to align buttons properly
-              justifyContent: 'center', // Center the buttons
-              gap: '1rem', // Add space between the buttons
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '1rem',
             }}
           >
             <Button disabled={activeStep === 0} onClick={handleBack}>

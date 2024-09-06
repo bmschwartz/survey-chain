@@ -35,18 +35,14 @@ const MySurveysList: React.FC<MySurveysListProps> = ({ surveys }) => {
             secondary={
               <>
                 <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline' }}>
-                  {survey.description.length > 40 ? `${survey.description.slice(0, 40)}...` : survey.description}
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'inline', marginLeft: '1rem' }}>
-                  Creator: {survey.creator}
+                  {survey.description.length > 40 ? `${survey.description.slice(0, 100)}...` : survey.description}
                 </Typography>
               </>
             }
           />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Typography variant="caption">Questions: {survey.questions}</Typography>
             <Button variant="outlined" color="primary">
-              Take Survey
+              View Details
             </Button>
           </Box>
         </ListItem>

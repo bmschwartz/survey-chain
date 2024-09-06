@@ -16,7 +16,7 @@ interface QuestionEditorDetailProps {
 }
 
 const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, isNew, onAddNew }) => {
-  const { addQuestion, updateQuestion, deleteQuestion } = useSurveyBuilder();
+  const { addQuestion, updateQuestion, deleteQuestion, validateStep } = useSurveyBuilder();
   const [localQuestion, setLocalQuestion] = useState<Question>(
     question || {
       id: 0,
@@ -88,7 +88,7 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
     return valid;
   };
 
-  const handleSaveQuestion = () => {
+  const handleSaveQuestion = async () => {
     if (validateQuestion()) {
       if (isNew) {
         addQuestion(localQuestion);
@@ -98,6 +98,7 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
         setInitialQuestion(localQuestion);
       }
     }
+    await validateStep();
   };
 
   const handleTypeChange = (event: SelectChangeEvent<QuestionType>) => {
