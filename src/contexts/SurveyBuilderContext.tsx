@@ -1,7 +1,8 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
-import useSWR, { mutate } from 'swr';
 
-import { fetcher } from '@/utils/fetcher';
+// import useSWR, { mutate } from 'swr';
+
+// import { fetcher } from '@/utils/fetcher';
 import { Question, QuestionType } from '../types';
 
 type ValidationError = string;
@@ -60,13 +61,13 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const { data: survey } = useSWR<SurveyDataResponse>(surveyId ? `/api/surveys/${surveyId}` : null, fetcher, {
-    onSuccess: (data) => {
-      setTitle(data.title);
-      setDescription(data.description);
-      setQuestions(data.questions);
-    },
-  });
+  // const { data: survey } = useSWR<SurveyDataResponse>(surveyId ? `/api/surveys/${surveyId}` : null, fetcher, {
+  //   onSuccess: (data) => {
+  //     setTitle(data.title);
+  //     setDescription(data.description);
+  //     setQuestions(data.questions);
+  //   },
+  // });
 
   console.log('Debug survey', survey);
 
@@ -178,18 +179,18 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
       isPublished: false,
     };
 
-    const response = await fetch(`/api/surveys/${surveyId || ''}`, {
-      method: surveyId ? 'PUT' : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(surveyData),
-    });
+    // const response = await fetch(`/api/surveys/${surveyId || ''}`, {
+    //   method: surveyId ? 'PUT' : 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(surveyData),
+    // });
 
-    if (response.ok) {
-      const savedSurvey = await response.json();
-      mutate(`/api/surveys/${savedSurvey.id}`); // Revalidate survey data
-    }
+    // if (response.ok) {
+    //   const savedSurvey = await response.json();
+    //   mutate(`/api/surveys/${savedSurvey.id}`); // Revalidate survey data
+    // }
   };
 
   return (

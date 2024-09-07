@@ -1,0 +1,15 @@
+import '@/auth';
+
+import { prisma } from '@/services/prisma';
+import { GQLContext } from '@/types/GQLContext';
+
+export const getSurvey = async (_: unknown, {}, { session }: GQLContext) => {
+  if (!session.user.id) {
+    throw new Error('You must be logged in to view your surveys.');
+  }
+
+  return await prisma.survey.findMany({
+    where: { creatorId: session.user.id },
+    include: { creator: true, versions: true, responses: true },
+  });
+};
