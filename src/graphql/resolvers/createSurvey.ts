@@ -1,6 +1,6 @@
 import '@/auth';
 
-import { prisma } from '@/services/prisma';
+import { prisma } from '@/lib/prisma';
 import { GQLContext } from '@/types/GQLContext';
 
 interface CreateSurveyArgs {

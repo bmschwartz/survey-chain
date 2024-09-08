@@ -1,0 +1,8 @@
+
+mutation CreateSurvey($title: String!, $description: String!) {
+  createSurvey(title: $title, description: $description) {
+    id
+    title
+    description
+  }
+}

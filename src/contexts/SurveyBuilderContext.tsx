@@ -1,8 +1,9 @@
+// import useSWR, { mutate } from 'swr';
+import { useQuery } from '@apollo/client';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 
-// import useSWR, { mutate } from 'swr';
-
 // import { fetcher } from '@/utils/fetcher';
+import { getSurvey } from '@/graphql/queries';
 import { Question, QuestionType } from '../types';
 
 type ValidationError = string;

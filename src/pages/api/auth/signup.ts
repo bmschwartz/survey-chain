@@ -1,8 +1,8 @@
 import { ZodError } from 'zod';
 
-import { signUpSchema } from '@/lib/zod';
-import { prisma } from '@/services/prisma';
+import { prisma } from '@/lib/prisma';
 import { saltAndHashPassword } from '@/utils/password';
+import { signUpSchema } from '@/validators/zod';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 

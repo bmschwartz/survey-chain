@@ -1,6 +1,6 @@
 import '@/auth';
 
-import { prisma } from '@/services/prisma';
+import { prisma } from '@/lib/prisma';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getAllSurveys = async (_: unknown, __: unknown) => {

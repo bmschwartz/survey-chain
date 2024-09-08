@@ -4,7 +4,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 
 import { auth } from '@/auth';
 import { resolvers, typeDefs } from '@/graphql';
-import { prisma } from '@/services/prisma';
+import { prisma } from '@/lib/prisma';
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const apolloServer = new ApolloServer({ schema });

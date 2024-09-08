@@ -9,9 +9,11 @@ import type { ReactElement, ReactNode } from 'react';
 
 import '@/styles/globals.css';
 
+import { ApolloProvider } from '@apollo/client';
 import { SessionProvider } from 'next-auth/react';
 
 import Header from '@/components/common/Header';
+import apolloClient from '@/lib/apolloClient';
 import theme from '@/theme';
 
 export type NextPageWithLayout<P = NonNullable<unknown>, IP = P> = NextPage<P, IP> & {
@@ -27,14 +29,16 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <SessionProvider session={pageProps.session}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Header />
-        <Head>
-          <meta name="viewport" content="initial-scale=1, width=device-width" />
-        </Head>
-        <main>{getLayout(<Component {...pageProps} />)}</main>
-      </ThemeProvider>
+      <ApolloProvider client={apolloClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Header />
+          <Head>
+            <meta name="viewport" content="initial-scale=1, width=device-width" />
+          </Head>
+          <main>{getLayout(<Component {...pageProps} />)}</main>
+        </ThemeProvider>
+      </ApolloProvider>
     </SessionProvider>
   );
 }

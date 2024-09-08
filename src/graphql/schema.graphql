@@ -1,0 +1,108 @@
+# User type, which references Surveys and Responses
+type User {
+  id: ID!
+  displayName: String!
+  email: String!
+  emailVerified: String
+  image: String
+  surveys: [Survey!]!
+  responses: [SurveyResponse!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+# Survey type, which contains versions and responses
+type Survey {
+  id: ID!
+  title: String!
+  description: String
+  isPublished: Boolean!
+  currentVersion: Int!
+  versions: [SurveyVersion!]!
+  responses: [SurveyResponse!]!
+  creator: User!
+  createdAt: String!
+  updatedAt: String!
+}
+
+# SurveyVersion type to track different versions of a survey
+type SurveyVersion {
+  id: ID!
+  versionNumber: Int!
+  metadataHash: String
+  questions: [SurveyQuestion!]!
+  survey: Survey!
+  createdAt: String!
+}
+
+# SurveyQuestion type, which is part of a SurveyVersion
+type SurveyQuestion {
+  id: ID!
+  text: String!
+  questionType: QuestionType!
+  order: Int!
+  minValue: Int
+  maxValue: Int
+  options: [QuestionOption!]!
+}
+
+# QuestionOption type for multiple choice and dropdown options
+type QuestionOption {
+  id: ID!
+  text: String!
+  order: Int!
+}
+
+# SurveyResponse type, which references a user and a survey version
+type SurveyResponse {
+  id: ID!
+  submittedAt: String!
+  survey: Survey!
+  surveyVersion: SurveyVersion!
+  user: User
+  answers: [ResponseAnswer!]!
+}
+
+# ResponseAnswer type, representing an answer to a SurveyQuestion
+type ResponseAnswer {
+  id: ID!
+  answer: String!
+  question: SurveyQuestion!
+  response: SurveyResponse!
+}
+
+# Enum for different question types
+enum QuestionType {
+  MULTIPLE_CHOICE
+  FILL_IN_THE_BLANK
+  RATING_SCALE
+  DROPDOWN
+}
+
+# Queries to fetch surveys, responses, and users
+type Query {
+  # users: [User!]!
+  # user(id: ID!): User
+
+  surveys: [Survey!]!
+  mySurveys: [Survey!]!
+  survey(id: ID!): Survey
+  # surveyVersion(id: ID!): SurveyVersion
+  # surveyResponses(surveyId: ID!): [SurveyResponse!]!
+}
+
+# Mutations to create and update surveys, versions, responses, etc.
+type Mutation {
+  createSurvey(title: String!, description: String!): Survey!
+  # updateSurvey(id: ID!, title: String, description: String): Survey!
+  # createSurveyVersion(surveyId: ID!, metadataHash: String, versionNumber: Int!): SurveyVersion!
+  # createSurveyQuestion(surveyVersionId: ID!, text: String!, questionType: QuestionType!, order: Int!, minValue: Int, maxValue: Int): SurveyQuestion!
+  # createQuestionOption(questionId: ID!, text: String!, order: Int!): QuestionOption!
+  # submitSurveyResponse(surveyId: ID!, surveyVersionId: ID!, answers: [ResponseInput!]!): SurveyResponse!
+}
+
+# Input type for submitting survey responses
+input ResponseInput {
+  questionId: ID!
+  answer: String!
+}

@@ -1,0 +1,16 @@
+query GetSurvey($id: ID!) {
+  survey(id: $id) {
+    id
+    title
+    description
+    questions {
+      id
+      title
+      type
+      options {
+        id
+        title
+      }
+    }
+  }
+}

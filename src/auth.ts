@@ -3,9 +3,9 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { ZodError } from 'zod';
 
-import { signInSchema } from '@/lib/zod';
-import { prisma } from '@/services/prisma';
+import { prisma } from '@/lib/prisma';
 import { comparePassword } from '@/utils/password';
+import { signInSchema } from '@/validators/zod';
 
 import type { DefaultSession } from 'next-auth';
 import type { Provider } from 'next-auth/providers';
