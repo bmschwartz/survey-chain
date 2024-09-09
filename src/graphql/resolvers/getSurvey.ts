@@ -1,5 +1,7 @@
 import '@/auth';
 
+import { Visibility } from '@prisma/client';
+
 import { prisma } from '@/lib/prisma';
 import { GQLContext } from '@/types/GQLContext';
 
@@ -10,7 +12,7 @@ interface GetSurveyArgs {
 export const getSurvey = async (_: unknown, { id }: GetSurveyArgs, { session }: GQLContext) => {
   const survey = await prisma.survey.findUnique({
     where: { id },
-    include: { creator: true, responses: true, versions: true },
+    include: { creator: true, responses: true, questions: true },
   });
 
   if (!survey) {
@@ -18,6 +20,9 @@ export const getSurvey = async (_: unknown, { id }: GetSurveyArgs, { session }: 
   }
 
   if (!survey.isPublished && survey.creatorId !== session.user.id) {
+    throw new Error('You are not authorized to view this survey.');
+  } else if (survey.visibility === Visibility.PRIVATE && survey.creatorId !== session.user.id) {
+    // TODO: This will be updated to check if the user is a collaborator on the survey
     throw new Error('You are not authorized to view this survey.');
   }
 

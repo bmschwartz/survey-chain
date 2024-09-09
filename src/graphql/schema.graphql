@@ -11,31 +11,22 @@ type User {
   updatedAt: String!
 }
 
-# Survey type, which contains versions and responses
+# Survey type, which references questions and responses
 type Survey {
   id: ID!
   title: String!
   description: String
   isPublished: Boolean!
-  currentVersion: Int!
-  versions: [SurveyVersion!]!
+  visibility: Visibility!
+  archived: Boolean!
+  questions: [SurveyQuestion!]!
   responses: [SurveyResponse!]!
   creator: User!
   createdAt: String!
   updatedAt: String!
 }
 
-# SurveyVersion type to track different versions of a survey
-type SurveyVersion {
-  id: ID!
-  versionNumber: Int!
-  metadataHash: String
-  questions: [SurveyQuestion!]!
-  survey: Survey!
-  createdAt: String!
-}
-
-# SurveyQuestion type, which is part of a SurveyVersion
+# SurveyQuestion type, which includes different question types
 type SurveyQuestion {
   id: ID!
   text: String!
@@ -43,66 +34,83 @@ type SurveyQuestion {
   order: Int!
   minValue: Int
   maxValue: Int
-  options: [QuestionOption!]!
+  options: [QuestionOption!]!  # For MULTI_SELECT and SINGLE_SELECT questions
 }
 
-# QuestionOption type for multiple choice and dropdown options
+# QuestionOption type for MULTI_SELECT and SINGLE_SELECT question types
 type QuestionOption {
   id: ID!
   text: String!
   order: Int!
 }
 
-# SurveyResponse type, which references a user and a survey version
+# SurveyResponse type, which references a user's response to a survey
 type SurveyResponse {
   id: ID!
-  submittedAt: String!
-  survey: Survey!
-  surveyVersion: SurveyVersion!
-  user: User
+  isComplete: Boolean!
+  submittedAt: String
   answers: [ResponseAnswer!]!
+  survey: Survey!
+  user: User!
+  createdAt: String!
+  updatedAt: String!
 }
 
-# ResponseAnswer type, representing an answer to a SurveyQuestion
+# ResponseAnswer type, which references the question and stores the answer
 type ResponseAnswer {
   id: ID!
-  answer: String!
+  answer: Json!
+  answerType: AnswerType!
   question: SurveyQuestion!
-  response: SurveyResponse!
 }
 
-# Enum for different question types
+# Enum for different question types in a survey
 enum QuestionType {
-  MULTIPLE_CHOICE
+  MULTI_SELECT
   FILL_IN_THE_BLANK
   RATING_SCALE
-  DROPDOWN
+  SINGLE_SELECT
+}
+
+# Enum for different answer types in survey responses
+enum AnswerType {
+  FILL_IN_THE_BLANK
+  SINGLE_SELECT
+  MULTI_SELECT
+  RATING_SCALE
+}
+
+# Enum for survey visibility
+enum Visibility {
+  PUBLIC
+  PRIVATE
 }
 
 # Queries to fetch surveys, responses, and users
 type Query {
-  # users: [User!]!
-  # user(id: ID!): User
-
+  users: [User!]!
+  user(id: ID!): User
   surveys: [Survey!]!
-  mySurveys: [Survey!]!
   survey(id: ID!): Survey
-  # surveyVersion(id: ID!): SurveyVersion
-  # surveyResponses(surveyId: ID!): [SurveyResponse!]!
+  surveyResponses(surveyId: ID!): [SurveyResponse!]!
 }
 
-# Mutations to create and update surveys, versions, responses, etc.
+# Mutations to create and update surveys, questions, and responses
 type Mutation {
-  createSurvey(title: String!, description: String!): Survey!
-  # updateSurvey(id: ID!, title: String, description: String): Survey!
-  # createSurveyVersion(surveyId: ID!, metadataHash: String, versionNumber: Int!): SurveyVersion!
-  # createSurveyQuestion(surveyVersionId: ID!, text: String!, questionType: QuestionType!, order: Int!, minValue: Int, maxValue: Int): SurveyQuestion!
-  # createQuestionOption(questionId: ID!, text: String!, order: Int!): QuestionOption!
-  # submitSurveyResponse(surveyId: ID!, surveyVersionId: ID!, answers: [ResponseInput!]!): SurveyResponse!
+  createSurvey(title: String!, description: String!, visibility: Visibility!): Survey!
+  updateSurvey(id: ID!, title: String, description: String, visibility: Visibility): Survey!
+  archiveSurvey(id: ID!): Survey!
+
+  addSurveyQuestion(surveyId: ID!, text: String!, questionType: QuestionType!, order: Int!, minValue: Int, maxValue: Int, options: [String!]): SurveyQuestion!
+  updateSurveyQuestion(id: ID!, text: String, order: Int, minValue: Int, maxValue: Int, options: [String!]): SurveyQuestion!
+  deleteSurveyQuestion(id: ID!): SurveyQuestion!
+
+  submitSurveyResponse(surveyId: ID!, answers: [ResponseInput!]!): SurveyResponse!
 }
 
 # Input type for submitting survey responses
 input ResponseInput {
   questionId: ID!
-  answer: String!
+  answer: Json!
+  answerType: AnswerType!
 }

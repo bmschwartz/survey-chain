@@ -8,20 +8,112 @@ generator client {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  displayName   String      @unique
-  email         String      @unique
+  id            String    @id @default(cuid())
+  displayName   String    @unique
+  email         String    @unique
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
-  credential    Credential?
 
   surveys   Survey[]
   responses SurveyResponse[]
 
+  accounts   Account[]
+  sessions   Session[]
+  credential Credential?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Survey {
+  id          String           @id @default(cuid())
+  creatorId   String
+  title       String
+  description String?
+  isPublished Boolean          @default(false)
+  visibility  Visibility       @default(PUBLIC)
+  archived    Boolean          @default(false)
+  questions   SurveyQuestion[]
+  responses   SurveyResponse[]
+
+  creator User @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SurveyQuestion {
+  id           String           @id @default(cuid())
+  surveyId     String
+  text         String
+  questionType QuestionType
+  order        Int
+  minValue     Int?
+  maxValue     Int?
+  options      QuestionOption[]
+
+  survey          Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  responseAnswers ResponseAnswer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuestionOption {
+  id         String @id @default(cuid())
+  questionId String
+  text       String
+  order      Int
+
+  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model SurveyResponse {
+  id          String           @id @default(cuid())
+  surveyId    String
+  userId      String
+  isComplete  Boolean          @default(false)
+  submittedAt DateTime?
+  answers     ResponseAnswer[]
+
+  survey Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ResponseAnswer {
+  id         String     @id @default(cuid())
+  responseId String
+  questionId String
+  answer     Json
+  answerType AnswerType
+
+  response SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AnswerType {
+  FILL_IN_THE_BLANK
+  SINGLE_SELECT
+  MULTI_SELECT
+  RATING_SCALE
+}
+
+enum QuestionType {
+  MULTI_SELECT
+  FILL_IN_THE_BLANK
+  RATING_SCALE
+  SINGLE_SELECT
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
 }
 
 model Account {
@@ -71,85 +163,4 @@ model Credential {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model Survey {
-  id             String           @id @default(cuid())
-  creatorId      String
-  title          String
-  description    String?
-  isPublished    Boolean          @default(false)
-  currentVersion Int              @default(1)
-  versions       SurveyVersion[]
-  responses      SurveyResponse[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  creator User @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-}
-
-model SurveyVersion {
-  id            String           @id @default(cuid())
-  surveyId      String
-  versionNumber Int
-  metadataHash  String? // To store the hash of off-chain metadata
-  questions     SurveyQuestion[]
-  createdAt     DateTime         @default(now())
-
-  survey   Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  response SurveyResponse[]
-}
-
-model SurveyQuestion {
-  id              String           @id @default(cuid())
-  surveyVersionId String
-  text            String
-  questionType    QuestionType
-  order           Int
-  minValue        Int? // Used for rating scale questions
-  maxValue        Int? // Used for rating scale questions
-  options         QuestionOption[]
-
-  surveyVersion   SurveyVersion    @relation(fields: [surveyVersionId], references: [id], onDelete: Cascade)
-  responseAnswers ResponseAnswer[]
-}
-
-model QuestionOption {
-  id         String @id @default(cuid())
-  questionId String
-  text       String
-  order      Int
-
-  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-}
-
-model SurveyResponse {
-  id              String           @id @default(cuid())
-  surveyId        String
-  surveyVersionId String
-  userId          String?
-  submittedAt     DateTime         @default(now())
-  answers         ResponseAnswer[]
-
-  survey        Survey        @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  surveyVersion SurveyVersion @relation(fields: [surveyVersionId], references: [id], onDelete: Cascade)
-  user          User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-}
-
-model ResponseAnswer {
-  id         String @id @default(cuid())
-  responseId String
-  questionId String
-  answer     String
-
-  response SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
-  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-}
-
-enum QuestionType {
-  MULTIPLE_CHOICE
-  FILL_IN_THE_BLANK
-  RATING_SCALE
-  DROPDOWN
 }
