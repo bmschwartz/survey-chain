@@ -1,9 +1,9 @@
 // import useSWR, { mutate } from 'swr';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 
-// import { fetcher } from '@/utils/fetcher';
-import { getSurvey } from '@/graphql/queries';
+import CreateSurvey from '@/graphql/mutations/CreateSurvey';
+import GetSurvey from '@/graphql/queries/GetSurvey';
 import { Question, QuestionType } from '../types';
 
 type ValidationError = string;
@@ -62,15 +62,25 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  // const { data: survey } = useSWR<SurveyDataResponse>(surveyId ? `/api/surveys/${surveyId}` : null, fetcher, {
-  //   onSuccess: (data) => {
-  //     setTitle(data.title);
-  //     setDescription(data.description);
-  //     setQuestions(data.questions);
-  //   },
-  // });
+  const { data: survey } = useQuery(GetSurvey, {
+    variables: { id: surveyId },
+    onCompleted: (data) => {
+      console.log('Got survey data from GetSurvey', data);
+      setTitle(data.title);
+      setDescription(data.description);
+      setQuestions(data.questions);
+    },
+  });
+
+  const [createSurvey, { data: createSurveyData, loading: createSurveyLoading, error: createSurveyError }] =
+    useMutation(CreateSurvey, {
+      onCompleted: (data) => {
+        console.log('Create survey data onComplete', data);
+      },
+    });
 
   console.log('Debug survey', survey);
+  console.log('Debug create survey data', createSurveyData, createSurveyLoading, createSurveyError);
 
   const resetSurvey = () => {
     setTitle('');
@@ -173,12 +183,17 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   };
 
   const saveSurvey = async () => {
-    const surveyData = {
-      title,
-      description,
-      questions,
-      isPublished: false,
-    };
+    console.log('Debug save survey');
+    if (!survey) {
+      console.log('Calling createSurvey');
+      await createSurvey({
+        variables: {
+          title,
+          description,
+        },
+      });
+      return;
+    }
 
     // const response = await fetch(`/api/surveys/${surveyId || ''}`, {
     //   method: surveyId ? 'PUT' : 'POST',

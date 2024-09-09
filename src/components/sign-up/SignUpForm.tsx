@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { signUpSchema } from '@/lib/zod';
+import { signUpSchema } from '@/validators/zod';
 
 type SignUpFormData = {
   email: string;

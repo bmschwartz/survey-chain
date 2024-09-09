@@ -1,3 +1,5 @@
+scalar ResponseAnswerData
+
 # User type, which references Surveys and Responses
 type User {
   id: ID!
@@ -59,7 +61,7 @@ type SurveyResponse {
 # ResponseAnswer type, which references the question and stores the answer
 type ResponseAnswer {
   id: ID!
-  answer: Json!
+  answer: ResponseAnswerData!
   answerType: AnswerType!
   question: SurveyQuestion!
 }
@@ -111,6 +113,6 @@ type Mutation {
 # Input type for submitting survey responses
 input ResponseInput {
   questionId: ID!
-  answer: Json!
+  answer: ResponseAnswerData!
   answerType: AnswerType!
 }

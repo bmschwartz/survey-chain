@@ -3,5 +3,18 @@ query GetSurvey($id: ID!) {
     id
     title
     description
+    questions {
+      id
+      text
+      questionType
+      order
+      minValue
+      maxValue
+      options {
+        id
+        text
+        order
+      }
+    }
   }
 }

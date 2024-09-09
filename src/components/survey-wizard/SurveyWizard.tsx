@@ -15,13 +15,13 @@ const SurveyWizard: React.FC = () => {
     console.log('Debug errors', errors);
     if (errors.length > 0) {
       console.log('Debug errors', errors);
-      // setValidationErrors(errors);
       return;
     }
-    if (activeStep === steps.length - 1) {
-      await saveSurvey();
-      return;
-    }
+    // if (activeStep === steps.length - 1) {
+    //   await saveSurvey();
+    //   return;
+    // }
+    await saveSurvey();
     console.log('Debug activeStep', activeStep);
     setActiveStep((prevStep) => prevStep + 1);
   };
