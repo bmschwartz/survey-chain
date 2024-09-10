@@ -16,7 +16,6 @@ const CreateSurveyPage: React.FC = () => {
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const session = await auth(ctx);
 
-  console.log('create survey session', session);
   return {
     props: {
       session,

@@ -10,5 +10,5 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 const apolloServer = new ApolloServer({ schema });
 
 export default startServerAndCreateNextHandler(apolloServer, {
-  context: async (req, res) => ({ req, res, session: await auth(), prisma }),
+  context: async (req, res) => ({ req, res, session: await auth(req, res), prisma }),
 });

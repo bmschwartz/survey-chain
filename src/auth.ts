@@ -7,14 +7,16 @@ import { prisma } from '@/lib/prisma';
 import { comparePassword } from '@/utils/password';
 import { signInSchema } from '@/validators/zod';
 
-import type { DefaultSession } from 'next-auth';
+import type { User } from 'next-auth';
 import type { Provider } from 'next-auth/providers';
+
+interface SessionUser extends User {
+  displayName?: string;
+}
 
 declare module 'next-auth' {
   interface Session {
-    user: {
-      displayName?: string;
-    } & DefaultSession['user'];
+    user: SessionUser;
   }
 }
 
@@ -55,22 +57,30 @@ const providers: Provider[] = [
   }),
 ];
 
-export const providerMap = providers
-  .map((provider) => {
-    if (typeof provider === 'function') {
-      const providerData = provider();
-      return { id: providerData.id, name: providerData.name };
-    } else {
-      return { id: provider.id, name: provider.name };
-    }
-  })
-  .filter((provider) => provider.id !== 'credentials');
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   callbacks: {
     authorized: async ({ auth }) => {
       return !!auth;
+    },
+    jwt: async ({ token, user }: { token: any; user: SessionUser }) => {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.image = user.image;
+        token.displayName = user.displayName as string;
+      }
+
+      return token;
+    },
+    session: async ({ session, token }) => {
+      session.userId = token.id as string;
+      session.user.id = token.id as string;
+      session.user.email = token.email as string;
+      session.user.image = token.image as string;
+      session.user.displayName = token.displayName as string;
+
+      return session;
     },
   },
   providers,

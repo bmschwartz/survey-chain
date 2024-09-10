@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { gql } from '../__generated__/gql';
 
-const CreateSurvey = gql`
+const CreateSurvey = gql(`
   mutation CreateSurvey($title: String!, $description: String!) {
     createSurvey(title: $title, description: $description) {
       id
@@ -8,6 +8,6 @@ const CreateSurvey = gql`
       description
     }
   }
-`;
+`);
 
 export default CreateSurvey;

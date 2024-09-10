@@ -3,8 +3,8 @@ import { useMutation, useQuery } from '@apollo/client';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 import CreateSurvey from '@/graphql/mutations/CreateSurvey';
-import GetSurvey from '@/graphql/queries/GetSurvey';
-import { Question, QuestionType } from '../types';
+import GET_SURVEY from '@/graphql/queries/GetSurvey';
+import { Question, QuestionId, QuestionType } from '../types';
 
 type ValidationError = string;
 
@@ -22,8 +22,8 @@ interface SurveyBuilderContextType {
 
   addQuestion: (newQuestion: Question) => void;
   updateQuestion: (updatedQuestion: Question) => void;
-  deleteQuestion: (id: number) => void;
-  selectQuestion: (id: number | null) => void;
+  deleteQuestion: (id: QuestionId) => void;
+  selectQuestion: (id: QuestionId | null) => void;
   resetNewQuestion: () => Question;
   resetSurvey: () => void;
   saveSurvey: () => Promise<void>;
@@ -47,12 +47,6 @@ interface SurveyBuilderProviderProps {
   surveyId?: string;
 }
 
-interface SurveyDataResponse {
-  title: string;
-  description: string;
-  questions: Question[];
-}
-
 export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ children, surveyId }) => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [title, setTitle] = useState<string>('');
@@ -62,13 +56,17 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const { data: survey } = useQuery(GetSurvey, {
-    variables: { id: surveyId },
-    onCompleted: (data) => {
-      console.log('Got survey data from GetSurvey', data);
-      setTitle(data.title);
-      setDescription(data.description);
-      setQuestions(data.questions);
+  const { data: survey } = useQuery(GET_SURVEY, {
+    variables: { id: surveyId ?? '' },
+    onCompleted: ({ survey }) => {
+      if (!survey) {
+        return;
+      }
+      console.log('Got survey data from GetSurvey', survey);
+      setTitle(survey.title);
+      setDescription(survey.description ?? '');
+      setQuestions([]); // TODO: Set questions from survey data
+      setQuestions(survey.questions.map((q) => ({ id: q.id, text: q.text, type: q.questionType, options: [] })));
     },
   });
 
@@ -93,7 +91,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   const resetNewQuestion = (): Question => ({
     id: questions.length + 1,
     text: '',
-    type: QuestionType.MultipleChoice,
+    type: QuestionType.MultiSelect,
     options: [''], // Initialize with one empty option
   });
 
@@ -107,7 +105,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     setQuestions(updatedQuestions);
   };
 
-  const deleteQuestion = (id: number) => {
+  const deleteQuestion = (id: QuestionId) => {
     const questionIndex = questions.findIndex((q) => q.id === id);
     const updatedQuestions = questions.filter((q) => q.id !== id);
     setQuestions(updatedQuestions);
@@ -121,7 +119,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     }
   };
 
-  const selectQuestion = (id: number | null) => {
+  const selectQuestion = (id: QuestionId | null) => {
     if (id === null) {
       setIsAddingNewQuestion(true);
       setSelectedQuestion(null);

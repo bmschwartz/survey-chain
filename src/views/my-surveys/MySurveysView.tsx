@@ -4,23 +4,6 @@ import React from 'react';
 
 import MySurveysList from '@/components/my-surveys/MySurveysList';
 
-const surveys = [
-  {
-    id: '1',
-    title: 'Customer Satisfaction Survey',
-    description: 'Help us improve our service by filling out this short survey.',
-    creator: 'John Doe',
-    questions: 10,
-  },
-  {
-    id: '2',
-    title: 'Workplace Wellness Survey',
-    description: 'Share your feedback about your workplace environment.',
-    creator: 'Jane Smith',
-    questions: 20,
-  },
-];
-
 const MySurveysView: React.FC = () => {
   const router = useRouter();
 
@@ -46,7 +29,7 @@ const MySurveysView: React.FC = () => {
           Create Survey
         </Button>
       </Box>
-      <MySurveysList surveys={surveys} />
+      <MySurveysList />
     </Container>
   );
 };

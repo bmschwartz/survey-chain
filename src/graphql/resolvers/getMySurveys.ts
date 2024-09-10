@@ -10,6 +10,6 @@ export const getMySurveys = async (_: unknown, {}, { session }: GQLContext) => {
 
   return await prisma.survey.findMany({
     where: { creatorId: session.user.id },
-    include: { creator: true, responses: true, questions: true },
+    include: { responses: true, questions: true },
   });
 };

@@ -1,19 +1,41 @@
-import { Box, Button, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { useQuery } from '@apollo/client';
+import { Archive as ArchiveIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import { Box, Button, Chip, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 
-interface Survey {
+import GET_MY_SURVEYS from '@/graphql/queries/GetMySurveys';
+
+interface MySurveyItem {
   id: string;
   title: string;
   description: string;
-  creator: string;
-  questions: number;
+  isPublished: boolean;
+  archived: boolean;
+  visibility: string;
+  responseCount: number;
+  questionCount: number;
 }
 
-interface MySurveysListProps {
-  surveys: Survey[];
-}
+const MySurveysList: React.FC = () => {
+  const [surveys, setSurveys] = React.useState<MySurveyItem[]>([]);
 
-const MySurveysList: React.FC<MySurveysListProps> = ({ surveys }) => {
+  useQuery(GET_MY_SURVEYS, {
+    onCompleted: (data) => {
+      setSurveys(
+        data.mySurveys.map((survey: any) => ({
+          id: survey.id,
+          title: survey.title,
+          description: survey.description,
+          isPublished: survey.isPublished,
+          archived: survey.archived,
+          visibility: survey.visibility,
+          responseCount: survey.responses.length,
+          questionCount: survey.questions.length,
+        }))
+      );
+    },
+  });
+
   return (
     <List>
       {surveys.map((survey) => (
@@ -24,6 +46,7 @@ const MySurveysList: React.FC<MySurveysListProps> = ({ surveys }) => {
             borderBottom: '1px solid #e0e0e0',
             display: 'flex',
             justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           <ListItemText
@@ -34,13 +57,27 @@ const MySurveysList: React.FC<MySurveysListProps> = ({ surveys }) => {
             }
             secondary={
               <>
-                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline' }}>
-                  {survey.description.length > 40 ? `${survey.description.slice(0, 100)}...` : survey.description}
+                <Typography variant="body2" sx={{ color: 'text.secondary', marginBottom: '0.5rem' }}>
+                  {survey.description.length > 100 ? `${survey.description.slice(0, 100)}...` : survey.description}
                 </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Chip label={`${survey.questionCount} Questions`} color="info" />
+                  <Chip label={`${survey.responseCount} Responses`} color="secondary" />
+                </Box>
               </>
             }
           />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Tooltip title={survey.archived ? 'Archived' : 'Active'}>
+              <IconButton>
+                <ArchiveIcon color={survey.archived ? 'error' : 'success'} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={survey.visibility === 'public' ? 'Public' : 'Private'}>
+              <IconButton>
+                <VisibilityIcon color={survey.visibility === 'public' ? 'primary' : 'disabled'} />
+              </IconButton>
+            </Tooltip>
             <Button variant="outlined" color="primary">
               View Details
             </Button>

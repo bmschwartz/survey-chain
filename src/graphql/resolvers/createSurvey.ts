@@ -1,5 +1,7 @@
 import '@/auth';
 
+import { Visibility } from '@prisma/client';
+
 import { prisma } from '@/lib/prisma';
 import { GQLContext } from '@/types/GQLContext';
 
@@ -9,7 +11,8 @@ interface CreateSurveyArgs {
 }
 
 export const createSurvey = async (_: unknown, { title, description }: CreateSurveyArgs, { session }: GQLContext) => {
-  if (!session?.user?.id) {
+  const sessionUser = session?.user;
+  if (!sessionUser) {
     throw new Error('You must be logged in to create a survey.');
   }
 
@@ -17,8 +20,9 @@ export const createSurvey = async (_: unknown, { title, description }: CreateSur
     data: {
       title,
       description,
+      visibility: Visibility.PRIVATE,
       creator: {
-        connect: { id: session.user.id },
+        connect: { id: sessionUser.id },
       },
     },
     include: {

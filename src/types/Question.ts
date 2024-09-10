@@ -1,12 +1,14 @@
 export enum QuestionType {
-  MultipleChoice = 'multiple-choice',
-  FillInTheBlank = 'fill-in-the-blank',
-  RatingScale = 'rating-scale',
-  Dropdown = 'dropdown',
+  RatingScale = 'RATING_SCALE',
+  MultiSelect = 'MULTI_SELECT',
+  SingleSelect = 'SINGLE_SELECT',
+  FillInTheBlank = 'FILL_IN_THE_BLANK',
 }
 
+export type QuestionId = string | number;
+
 export interface Question {
-  id: number; // Unique identifier for the question
+  id: string | number; // Unique identifier for the question
   text: string; // The actual question text
   type: QuestionType;
   options?: string[]; // Options for multiple-choice, dropdown, etc.

@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { gql } from '../__generated__/gql';
 
-const GetSurvey = gql`
+const GET_SURVEY = gql(`
   query GetSurvey($id: ID!) {
     survey(id: $id) {
       id
@@ -21,6 +21,6 @@ const GetSurvey = gql`
       }
     }
   }
-`;
+`);
 
-export default GetSurvey;
+export default GET_SURVEY;

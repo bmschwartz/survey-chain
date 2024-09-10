@@ -94,17 +94,18 @@ type Query {
   user(id: ID!): User
   surveys: [Survey!]!
   survey(id: ID!): Survey
+  mySurveys: [Survey!]!
   surveyResponses(surveyId: ID!): [SurveyResponse!]!
 }
 
 # Mutations to create and update surveys, questions, and responses
 type Mutation {
-  createSurvey(title: String!, description: String!, visibility: Visibility!): Survey!
+  createSurvey(title: String!, description: String!): Survey!
   updateSurvey(id: ID!, title: String, description: String, visibility: Visibility): Survey!
   archiveSurvey(id: ID!): Survey!
 
-  addSurveyQuestion(surveyId: ID!, text: String!, questionType: QuestionType!, order: Int!, minValue: Int, maxValue: Int, options: [String!]): SurveyQuestion!
-  updateSurveyQuestion(id: ID!, text: String, order: Int, minValue: Int, maxValue: Int, options: [String!]): SurveyQuestion!
+  addSurveyQuestion(surveyId: ID!, text: String!, questionType: QuestionType!, order: Int!, minValue: Int, maxValue: Int, options: [QuestionOptionInput!]): SurveyQuestion!
+  updateSurveyQuestion(id: ID!, text: String, order: Int, minValue: Int, maxValue: Int, options: [QuestionOptionInput!]): SurveyQuestion!
   deleteSurveyQuestion(id: ID!): SurveyQuestion!
 
   submitSurveyResponse(surveyId: ID!, answers: [ResponseInput!]!): SurveyResponse!
@@ -115,4 +116,9 @@ input ResponseInput {
   questionId: ID!
   answer: ResponseAnswerData!
   answerType: AnswerType!
+}
+
+input QuestionOptionInput {
+  text: String!
+  order: Int!
 }
