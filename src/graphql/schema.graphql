@@ -17,7 +17,7 @@ type User {
 type Survey {
   id: ID!
   title: String!
-  description: String
+  description: String!
   isPublished: Boolean!
   visibility: Visibility!
   archived: Boolean!

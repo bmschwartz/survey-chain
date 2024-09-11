@@ -16,7 +16,7 @@ const documents = {
     "\n  mutation CreateSurvey($title: String!, $description: String!) {\n    createSurvey(title: $title, description: $description) {\n      id\n      title\n      description\n    }\n  }\n": types.CreateSurveyDocument,
     "\n  query GetAllSurveys {\n    surveys {\n      id\n      title\n      description\n      creator {\n        id\n        displayName\n      }\n      questions {\n        id\n      }\n    }\n  }\n": types.GetAllSurveysDocument,
     "\n  query GetMySurveys {\n    mySurveys {\n      id\n      title\n      description\n      isPublished\n      archived\n      visibility\n      responses {\n        id\n      }\n      questions {\n        id\n      }\n    }\n  }\n": types.GetMySurveysDocument,
-    "\n  query GetSurvey($id: ID!) {\n    survey(id: $id) {\n      id\n      title\n      description\n      questions {\n        id\n        text\n        questionType\n        order\n        minValue\n        maxValue\n        options {\n          id\n          text\n          order\n        }\n      }\n    }\n  }\n": types.GetSurveyDocument,
+    "\n  query GetSurvey($id: ID!) {\n    survey(id: $id) {\n      id\n      title\n      description\n      creator {\n        id\n      }\n      questions {\n        id\n        text\n        questionType\n        order\n        minValue\n        maxValue\n        options {\n          id\n          text\n          order\n        }\n      }\n    }\n  }\n": types.GetSurveyDocument,
 };
 
 /**
@@ -48,7 +48,7 @@ export function gql(source: "\n  query GetMySurveys {\n    mySurveys {\n      id
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetSurvey($id: ID!) {\n    survey(id: $id) {\n      id\n      title\n      description\n      questions {\n        id\n        text\n        questionType\n        order\n        minValue\n        maxValue\n        options {\n          id\n          text\n          order\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetSurvey($id: ID!) {\n    survey(id: $id) {\n      id\n      title\n      description\n      questions {\n        id\n        text\n        questionType\n        order\n        minValue\n        maxValue\n        options {\n          id\n          text\n          order\n        }\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query GetSurvey($id: ID!) {\n    survey(id: $id) {\n      id\n      title\n      description\n      creator {\n        id\n      }\n      questions {\n        id\n        text\n        questionType\n        order\n        minValue\n        maxValue\n        options {\n          id\n          text\n          order\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetSurvey($id: ID!) {\n    survey(id: $id) {\n      id\n      title\n      description\n      creator {\n        id\n      }\n      questions {\n        id\n        text\n        questionType\n        order\n        minValue\n        maxValue\n        options {\n          id\n          text\n          order\n        }\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

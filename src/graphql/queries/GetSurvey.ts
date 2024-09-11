@@ -6,6 +6,9 @@ const GET_SURVEY = gql(`
       id
       title
       description
+      creator {
+        id
+      }
       questions {
         id
         text
