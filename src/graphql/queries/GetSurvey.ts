@@ -8,7 +8,13 @@ const GET_SURVEY = gql(`
       description
       creator {
         id
+        displayName
       }
+      isPublished
+      visibility
+      archived
+      createdAt
+      updatedAt
       questions {
         id
         text
@@ -20,6 +26,16 @@ const GET_SURVEY = gql(`
           id
           text
           order
+        }
+      }
+      responses {
+        id
+        createdAt
+        updatedAt
+        answers {
+          id
+          answer
+          answerType
         }
       }
     }

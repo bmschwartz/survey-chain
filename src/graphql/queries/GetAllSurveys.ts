@@ -6,11 +6,19 @@ const GET_ALL_SURVEYS = gql(`
       id
       title
       description
+      archived
+      createdAt
+      updatedAt
+      visibility
+      isPublished
       creator {
         id
         displayName
       }
       questions {
+        id
+      }
+      responses {
         id
       }
     }

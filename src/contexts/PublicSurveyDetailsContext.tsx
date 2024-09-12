@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useContext } from 'react';
 
-import { Survey } from '@/graphql/types';
+import { Survey } from '@/types';
 
 interface PublicSurveyDetailsContextType {
   survey: Survey;

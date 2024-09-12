@@ -10,6 +10,7 @@ const MySurveysView: React.FC = () => {
   const handleCreateSurvey = () => {
     // Navigate to the survey creation page
     router.push('/surveys/create');
+    return;
   };
 
   return (

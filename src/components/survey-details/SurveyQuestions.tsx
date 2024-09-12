@@ -2,15 +2,10 @@
 import { Box, List, ListItem, ListItemText, Typography } from '@mui/material';
 import React from 'react';
 
-interface Question {
-  id: string;
-  questionText: string;
-  questionType: string;
-  options: string[];
-}
+import { SurveyQuestion } from '@/types';
 
 interface SurveyQuestionsProps {
-  questions: Question[];
+  questions: SurveyQuestion[];
 }
 
 const SurveyQuestions: React.FC<SurveyQuestionsProps> = ({ questions }) => {
@@ -20,7 +15,7 @@ const SurveyQuestions: React.FC<SurveyQuestionsProps> = ({ questions }) => {
       <List>
         {questions.map((question) => (
           <ListItem key={question.id}>
-            <ListItemText primary={question.questionText} secondary={question.questionType} />
+            <ListItemText primary={question.text} secondary={question.questionType} />
           </ListItem>
         ))}
       </List>

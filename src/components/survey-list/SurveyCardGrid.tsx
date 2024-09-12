@@ -1,15 +1,8 @@
 import { Grid2 } from '@mui/material';
 import React from 'react';
 
+import { Survey } from '@/types';
 import SurveyCard from './SurveyCard';
-
-interface Survey {
-  id: string;
-  title: string;
-  description: string;
-  creator: string;
-  questions: number;
-}
 
 interface SurveyCardGridProps {
   surveys: Survey[];

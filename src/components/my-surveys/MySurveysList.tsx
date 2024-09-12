@@ -1,6 +1,7 @@
 import { useQuery } from '@apollo/client';
 import { Archive as ArchiveIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import { Box, Button, Chip, IconButton, List, ListItem, ListItemText, Tooltip, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 import GET_MY_SURVEYS from '@/graphql/queries/GetMySurveys';
@@ -17,6 +18,7 @@ interface MySurveyItem {
 }
 
 const MySurveysList: React.FC = () => {
+  const router = useRouter();
   const [surveys, setSurveys] = React.useState<MySurveyItem[]>([]);
 
   useQuery(GET_MY_SURVEYS, {
@@ -35,6 +37,10 @@ const MySurveysList: React.FC = () => {
       );
     },
   });
+
+  const handleViewDetailsClick = (surveyId: string) => {
+    return router.push(`/surveys/${surveyId}`);
+  };
 
   return (
     <List>
@@ -78,7 +84,7 @@ const MySurveysList: React.FC = () => {
                 <VisibilityIcon color={survey.visibility === 'public' ? 'primary' : 'disabled'} />
               </IconButton>
             </Tooltip>
-            <Button variant="outlined" color="primary">
+            <Button variant="outlined" color="primary" onClick={() => handleViewDetailsClick(survey.id)}>
               View Details
             </Button>
           </Box>

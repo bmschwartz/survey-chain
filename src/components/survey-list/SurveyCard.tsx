@@ -1,17 +1,21 @@
 import { Box, Button, Card, CardActions, CardContent, Divider, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 import React from 'react';
 
+import { Survey } from '@/types';
+
 interface SurveyCardProps {
-  survey: {
-    id: string;
-    title: string;
-    description: string;
-    creator: string;
-    questions: number;
-  };
+  survey: Survey;
 }
 
 const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
+  const router = useRouter();
+
+  const handleTakeSurvey = () => {
+    console.log('DEBUG - /surveys/', survey.id);
+    return router.push(`/surveys/${survey.id}`);
+  };
+
   return (
     <Card
       sx={{
@@ -32,10 +36,10 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
           {survey.description.length > 40 ? `${survey.description.slice(0, 40)}...` : survey.description}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Creator: {survey.creator}
+          Creator: {survey.creator?.displayName}
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ marginLeft: '1rem' }}>
-          Questions: {survey.questions}
+          Questions: {survey.questions.length}
         </Typography>
       </CardContent>
 
@@ -43,7 +47,7 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
 
       <CardActions sx={{ marginBottom: 1 }}>
         <Box sx={{ margin: 'auto' }}>
-          <Button variant="outlined" color="primary">
+          <Button variant="outlined" color="primary" onClick={handleTakeSurvey}>
             Take Survey
           </Button>
         </Box>

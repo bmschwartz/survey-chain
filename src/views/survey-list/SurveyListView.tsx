@@ -1,27 +1,21 @@
+import { useQuery } from '@apollo/client';
 import { Container, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 
 import SurveyCardGrid from '@/components/survey-list/SurveyCardGrid';
-
-const surveys = [
-  {
-    id: '1',
-    title: 'Customer Satisfaction Survey',
-    description: 'Help us improve our service by filling out this short survey.',
-    creator: 'John Doe',
-    questions: 10,
-  },
-  {
-    id: '2',
-    title: 'Workplace Wellness Survey',
-    description: 'Share your feedback about your workplace environment.',
-    creator: 'Jane Smith',
-    questions: 20,
-  },
-  // More surveys...
-];
+import GET_ALL_SURVEYS from '@/graphql/queries/GetAllSurveys';
+import { GetAllSurveysQuery, Survey as GQLSurvey } from '@/graphql/types';
+import { Survey, transformSurvey } from '@/types';
 
 const SurveyListView: React.FC = () => {
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+
+  useQuery(GET_ALL_SURVEYS, {
+    onCompleted: (data: GetAllSurveysQuery) => {
+      setSurveys(data.surveys.map((survey) => transformSurvey(survey as GQLSurvey)));
+    },
+  });
+
   return (
     <Container maxWidth="lg" sx={{ marginTop: '2rem' }}>
       <Typography variant="h4" sx={{ marginBottom: '2rem', textAlign: 'center' }}>

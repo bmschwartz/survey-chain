@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import { MySurveyDetailsProvider } from '@/contexts/MySurveyDetailsContext';
 import { PublicSurveyDetailsProvider } from '@/contexts/PublicSurveyDetailsContext';
 import GET_SURVEY from '@/graphql/queries/GetSurvey';
+import { Survey as GQLSurvey } from '@/graphql/types';
+import { transformSurvey } from '@/types';
 import MySurveyDetailsView from '@/views/survey-details/MySurveyDetailsView';
 import PublicSurveyDetailsView from '@/views/survey-details/PublicSurveyDetailsView';
 
@@ -21,19 +23,22 @@ const SurveyDetailsPage: React.FC = () => {
 
   if (loading) return <CircularProgress />;
   if (error || !data?.survey) {
+    console.log('DEBUG error or no data', error, data);
+    return <>Help!</>;
     return router.push('/404');
   }
 
-  const isCreator = data.survey.creator.id === session?.user?.id;
+  const isCreator = data?.survey?.creator?.id === session?.user?.id;
+  const survey = transformSurvey(data?.survey as GQLSurvey);
 
   return (
     <Container maxWidth="lg" sx={{ mt: '2rem' }}>
       {isCreator ? (
-        <MySurveyDetailsProvider survey={data.survey}>
+        <MySurveyDetailsProvider survey={survey}>
           <MySurveyDetailsView />
         </MySurveyDetailsProvider>
       ) : (
-        <PublicSurveyDetailsProvider survey={data.survey}>
+        <PublicSurveyDetailsProvider survey={survey}>
           <PublicSurveyDetailsView />
         </PublicSurveyDetailsProvider>
       )}
