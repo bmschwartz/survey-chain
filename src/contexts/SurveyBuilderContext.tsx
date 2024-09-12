@@ -1,30 +1,34 @@
 // import useSWR, { mutate } from 'swr';
 import { useMutation, useQuery } from '@apollo/client';
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
-import CreateSurvey from '@/graphql/mutations/CreateSurvey';
+import ADD_SURVEY_QUESTION from '@/graphql/mutations/AddSurveyQuestion';
+import CREATE_SURVEY from '@/graphql/mutations/CreateSurvey';
 import GET_SURVEY from '@/graphql/queries/GetSurvey';
-import { Question, QuestionId, QuestionType } from '../types';
+import { SurveyQuestion as GQLSurveyQuestion } from '@/graphql/types';
+import { QuestionId, QuestionOption, QuestionType, SurveyQuestion } from '@/types';
 
 type ValidationError = string;
 
 interface SurveyBuilderContextType {
   activeStep: number;
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  moveToStep: (step: number) => void;
   title: string;
   description: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
-  questions: Question[];
-  selectedQuestion: Question | null;
+  questions: SurveyQuestion[];
+  selectedQuestion: SurveyQuestion | null;
   isAddingNewQuestion: boolean;
   validationErrors: ValidationError[];
 
-  addQuestion: (newQuestion: Question) => void;
-  updateQuestion: (updatedQuestion: Question) => void;
+  addQuestion: (newQuestion: SurveyQuestion) => Promise<SurveyQuestion>;
+  updateQuestion: (updatedQuestion: SurveyQuestion) => void;
   deleteQuestion: (id: QuestionId) => void;
   selectQuestion: (id: QuestionId | null) => void;
-  resetNewQuestion: () => Question;
+  resetNewQuestion: () => SurveyQuestion;
+  createPlaceholderOption: () => QuestionOption;
   resetSurvey: () => void;
   saveSurvey: () => Promise<void>;
   setIsAddingNewQuestion: React.Dispatch<React.SetStateAction<boolean>>;
@@ -45,40 +49,93 @@ export const useSurveyBuilder = () => {
 interface SurveyBuilderProviderProps {
   children: ReactNode;
   surveyId?: string;
+  step?: number;
 }
 
-export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ children, surveyId }) => {
-  const [activeStep, setActiveStep] = useState<number>(0);
+export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
+  step,
+  children,
+  surveyId: initialSurveyId,
+}) => {
+  const router = useRouter();
+  const [surveyId, setSurveyId] = useState<string | null>(initialSurveyId || null);
+  const [activeStep, setActiveStep] = useState<number>(step || 0);
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
   const [isAddingNewQuestion, setIsAddingNewQuestion] = useState<boolean>(true);
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<SurveyQuestion | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
+  useEffect(() => {
+    router.push(
+      {
+        pathname: '/surveys/create',
+        query: { ...router.query, surveyId, step: String(activeStep) },
+      },
+      undefined,
+      { shallow: true }
+    );
+  }, [surveyId, activeStep]);
+
   const { data: survey } = useQuery(GET_SURVEY, {
+    fetchPolicy: 'network-only',
     variables: { id: surveyId ?? '' },
     onCompleted: ({ survey }) => {
       if (!survey) {
         return;
       }
-      console.log('Got survey data from GetSurvey', survey);
+
+      const transformedQuestions = survey.questions.map(transformSurveyQuestion);
+
+      setSurveyId(survey.id);
       setTitle(survey.title);
-      setDescription(survey.description ?? '');
-      setQuestions([]); // TODO: Set questions from survey data
-      setQuestions(survey.questions.map((q) => ({ id: q.id, text: q.text, type: q.questionType, options: [] })));
+      setDescription(survey.description);
+      setQuestions(transformedQuestions);
+
+      if (!selectedQuestion) {
+        setSelectedQuestion(transformedQuestions.length > 0 ? transformedQuestions[0] : null);
+      }
     },
   });
 
-  const [createSurvey, { data: createSurveyData, loading: createSurveyLoading, error: createSurveyError }] =
-    useMutation(CreateSurvey, {
-      onCompleted: (data) => {
-        console.log('Create survey data onComplete', data);
-      },
-    });
+  const [createSurvey, { loading: createSurveyLoading, error: createSurveyError }] = useMutation(CREATE_SURVEY, {
+    onCompleted: ({ createSurvey: data }) => {
+      if (!data) {
+        return;
+      }
+      setSurveyId(data.id);
+      setTitle(data.title);
+      setDescription(data.description);
+      console.log('Create survey data onComplete', data);
+    },
+  });
 
-  console.log('Debug survey', survey);
-  console.log('Debug create survey data', createSurveyData, createSurveyLoading, createSurveyError);
+  const [
+    addSurveyQuestion,
+    { data: addSurveyQuestionData, loading: addSurveyQuestionLoading, error: addSurveyQuestionError },
+  ] = useMutation(ADD_SURVEY_QUESTION, {
+    onCompleted: ({ addSurveyQuestion: result }) => {
+      console.log(
+        'Add survey question data onComplete',
+        result,
+        addSurveyQuestionData,
+        addSurveyQuestionLoading,
+        addSurveyQuestionError
+      );
+    },
+  });
+
+  const transformSurveyQuestion = (gqlQuestion: GQLSurveyQuestion): SurveyQuestion => {
+    const { id, text, order, questionType, options } = gqlQuestion;
+    return {
+      id,
+      text,
+      order,
+      questionType,
+      options: options.map((o) => ({ id: o.id, text: o.text, order: o.order })),
+    };
+  };
 
   const resetSurvey = () => {
     setTitle('');
@@ -88,19 +145,79 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     setSelectedQuestion(null);
   };
 
-  const resetNewQuestion = (): Question => ({
-    id: questions.length + 1,
-    text: '',
-    type: QuestionType.MultiSelect,
-    options: [''], // Initialize with one empty option
-  });
-
-  const addQuestion = (newQuestion: Question) => {
-    setQuestions([...questions, newQuestion]);
-    setSelectedQuestion(newQuestion);
+  const moveToStep = (step: number) => {
+    setActiveStep(step);
   };
 
-  const updateQuestion = (updatedQuestion: Question) => {
+  const createPlaceholderOption = (): QuestionOption => ({
+    id: Date.now().toString(),
+    text: '',
+    order: 0,
+  });
+
+  const resetNewQuestion = (): SurveyQuestion => ({
+    id: Date.now().toString(),
+    text: '',
+    order: questions.length,
+    questionType: QuestionType.MultiSelect,
+    options: [createPlaceholderOption()],
+  });
+
+  const addQuestion = async (newQuestion: SurveyQuestion): Promise<SurveyQuestion> => {
+    console.log('Debug question data to add', surveyId, newQuestion.text, newQuestion.questionType, newQuestion.order);
+    if (!surveyId || !newQuestion.text || !newQuestion.questionType || newQuestion.order === undefined) {
+      throw new Error('Invalid question data');
+    }
+
+    for (const option of newQuestion.options || []) {
+      if (!option.text || option.order === undefined) {
+        throw new Error('Invalid option data');
+      }
+    }
+
+    console.log('Debug add question', {
+      surveyId,
+      text: newQuestion.text,
+      order: newQuestion.order,
+      questionType: newQuestion.questionType,
+      options: newQuestion.options?.map((o) => ({ text: o.text!, order: o.order! })) || [],
+    });
+
+    const result = await addSurveyQuestion({
+      variables: {
+        surveyId,
+        text: newQuestion.text,
+        order: newQuestion.order,
+        questionType: newQuestion.questionType,
+        options: newQuestion.options?.map((o) => ({ text: o.text!, order: o.order! })) || [],
+      },
+    });
+
+    const createdQuestion = result.data?.addSurveyQuestion;
+    if (!createdQuestion) {
+      throw new Error('Failed to add question');
+    }
+
+    console.log('Debug created question', createdQuestion);
+    const { id, options, order, questionType, text } = createdQuestion;
+    const transformedQuestion: SurveyQuestion = {
+      id,
+      text,
+      order,
+      questionType,
+      options: options.map((o) => ({ id: o.id, text: o.text, order: o.order })),
+    };
+
+    console.log('Debug transformed question', transformedQuestion);
+    setQuestions([...questions, transformedQuestion]);
+    setSelectedQuestion(transformedQuestion);
+
+    console.log('Debug questions and selected', questions, selectedQuestion);
+
+    return transformedQuestion;
+  };
+
+  const updateQuestion = (updatedQuestion: SurveyQuestion) => {
     const updatedQuestions = questions.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q));
     setQuestions(updatedQuestions);
   };
@@ -120,12 +237,17 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
   };
 
   const selectQuestion = (id: QuestionId | null) => {
+    console.log('selectQuestion', id);
     if (id === null) {
       setIsAddingNewQuestion(true);
       setSelectedQuestion(null);
       return;
     }
 
+    console.log(
+      'setting question',
+      questions.find((q) => q.id === id)
+    );
     setIsAddingNewQuestion(false);
     setSelectedQuestion(questions.find((q) => q.id === id) || null);
   };
@@ -147,7 +269,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     if (questions.length === 0) {
       validationErrors.push('Please add at least one question');
     }
-    if (questions.some((q) => q.text.trim() === '')) {
+    if (questions.some((q) => (q.text || '').trim() === '')) {
       validationErrors.push('Please fill out all question text fields');
     }
 
@@ -180,31 +302,28 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
     return errors;
   };
 
+  const createNewSurvey = async () => {
+    if (!title) {
+      throw new Error('Title is required');
+    }
+    console.log('Calling createSurvey');
+    await createSurvey({
+      variables: {
+        title,
+        description,
+      },
+    });
+  };
+
   const saveSurvey = async () => {
     console.log('Debug save survey');
     if (!survey) {
-      console.log('Calling createSurvey');
-      await createSurvey({
-        variables: {
-          title,
-          description,
-        },
-      });
+      await createNewSurvey();
       return;
     }
 
-    // const response = await fetch(`/api/surveys/${surveyId || ''}`, {
-    //   method: surveyId ? 'PUT' : 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(surveyData),
-    // });
-
-    // if (response.ok) {
-    //   const savedSurvey = await response.json();
-    //   mutate(`/api/surveys/${savedSurvey.id}`); // Revalidate survey data
-    // }
+    // TODO: update survey
+    // await updateSurvey()
   };
 
   return (
@@ -218,17 +337,18 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({ ch
         selectedQuestion,
         isAddingNewQuestion,
         setIsAddingNewQuestion,
-        setActiveStep,
+        moveToStep,
         setTitle,
         setDescription,
         addQuestion,
         updateQuestion,
         deleteQuestion,
         selectQuestion,
-        resetNewQuestion,
         resetSurvey,
         saveSurvey,
         validateStep,
+        createPlaceholderOption,
+        resetNewQuestion,
       }}
     >
       {children}

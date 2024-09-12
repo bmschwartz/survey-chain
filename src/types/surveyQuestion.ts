@@ -3,8 +3,10 @@ import { SurveyQuestion as GQLSurveyQuestion } from '@/graphql/__generated__/gra
 import { QuestionOption, transformQuestionOption } from './questionOption';
 import { QuestionType, transformQuestionType } from './questionType';
 
+export type QuestionId = string | number;
+
 export interface SurveyQuestion {
-  id: string; // Required
+  id: QuestionId; // Required
   text?: string;
   questionType?: QuestionType;
   order?: number;

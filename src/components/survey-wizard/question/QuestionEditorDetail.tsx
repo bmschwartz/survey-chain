@@ -3,29 +3,23 @@ import { isEqual } from 'lodash';
 import React, { useEffect, useState } from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
-import { Question, QuestionType } from '@/types';
+import { QuestionOption, QuestionType, SurveyQuestion } from '@/types';
 
 const MAX_OPTIONS = 10;
 const MAX_QUESTION_TEXT_LENGTH = 1000;
 const MAX_OPTION_LENGTH = 300;
 
 interface QuestionEditorDetailProps {
-  question: Question | null;
+  question: SurveyQuestion | null;
   isNew: boolean;
   onAddNew: () => void;
 }
 
 const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, isNew, onAddNew }) => {
-  const { addQuestion, updateQuestion, deleteQuestion, validateStep } = useSurveyBuilder();
-  const [localQuestion, setLocalQuestion] = useState<Question>(
-    question || {
-      id: 0,
-      text: '',
-      type: QuestionType.MultipleChoice,
-      options: [''], // Initialize with one empty option
-    }
-  );
-  const [initialQuestion, setInitialQuestion] = useState<Question | null>(question);
+  const { addQuestion, updateQuestion, deleteQuestion, validateStep, createPlaceholderOption, resetNewQuestion } =
+    useSurveyBuilder();
+  const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question || resetNewQuestion());
+  const [initialQuestion, setInitialQuestion] = useState<SurveyQuestion | null>(question);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
 
@@ -41,44 +35,40 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
   }, [question, initialQuestion]);
 
   useEffect(() => {
-    // Ensure there's at least one empty option for MultipleChoice or Dropdown
+    // Ensure there's at least one empty option for MultiSelect or SingleSelect
     if (
-      (localQuestion.type === QuestionType.MultipleChoice || localQuestion.type === QuestionType.Dropdown) &&
+      (localQuestion.questionType === QuestionType.MultiSelect ||
+        localQuestion.questionType === QuestionType.SingleSelect) &&
       (!localQuestion.options || localQuestion.options.length === 0)
     ) {
-      setLocalQuestion({ ...localQuestion, options: [''] });
+      setLocalQuestion({ ...localQuestion, options: [createPlaceholderOption()] });
+      return;
     }
 
-    setLocalQuestion(
-      question || {
-        id: 0,
-        text: '',
-        type: QuestionType.MultipleChoice,
-        options: [''],
-      }
-    );
+    setLocalQuestion(initialQuestion || resetNewQuestion());
   }, [question]);
 
   const validateQuestion = () => {
     let valid = true;
     const newErrors: { [key: string]: string | null } = {};
 
-    if (!localQuestion.text.trim()) {
+    if (!localQuestion.text?.trim()) {
       newErrors.text = 'Question text is required';
       valid = false;
     }
 
     if (
-      (localQuestion.type === QuestionType.MultipleChoice || localQuestion.type === QuestionType.Dropdown) &&
-      (!localQuestion.options || localQuestion.options.length === 0 || !localQuestion.options[0].trim())
+      (localQuestion.questionType === QuestionType.MultiSelect ||
+        localQuestion.questionType === QuestionType.SingleSelect) &&
+      (!localQuestion.options || localQuestion.options.length === 0 || !localQuestion.options[0].text?.trim())
     ) {
       newErrors.options = 'At least one option is required';
       valid = false;
     }
 
-    if (localQuestion.type === QuestionType.RatingScale) {
+    if (localQuestion.questionType === QuestionType.RatingScale) {
       const [min, max] = localQuestion.options!;
-      if (parseInt(min) >= parseInt(max)) {
+      if (parseInt(min.text || 'Inf') >= parseInt(max.text || '-Inf')) {
         newErrors.rating = 'Minimum rating must be less than maximum rating';
         valid = false;
       }
@@ -91,8 +81,9 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
   const handleSaveQuestion = async () => {
     if (validateQuestion()) {
       if (isNew) {
-        addQuestion(localQuestion);
-        onAddNew(); // Prepare for next question
+        const newQ = await addQuestion(localQuestion);
+        console.log('DEBUG new question', newQ);
+        onAddNew();
       } else {
         updateQuestion(localQuestion);
         setInitialQuestion(localQuestion);
@@ -103,15 +94,19 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
 
   const handleTypeChange = (event: SelectChangeEvent<QuestionType>) => {
     const newType = event.target.value as QuestionType;
-    let newOptions: string[] = [];
+    let newOptions: QuestionOption[] = [];
 
-    if (newType === QuestionType.MultipleChoice || newType === QuestionType.Dropdown) {
-      newOptions = ['']; // Default to one empty option
+    if (newType === QuestionType.MultiSelect || newType === QuestionType.SingleSelect) {
+      newOptions = [createPlaceholderOption()]; // Default to one empty option
     } else if (newType === QuestionType.RatingScale) {
-      newOptions = ['1', '5'];
+      newOptions = [
+        { ...createPlaceholderOption(), text: '1' },
+        { ...createPlaceholderOption(), order: 1, text: '5' },
+      ];
+      console.log('DEBUG RatingScale new options', newOptions);
     }
 
-    setLocalQuestion({ ...localQuestion, type: newType, options: newOptions });
+    setLocalQuestion({ ...localQuestion, questionType: newType, options: newOptions });
   };
 
   const handleQuestionTextChange = (value: string) => {
@@ -121,7 +116,7 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
 
   const handleOptionChange = (index: number, value: string) => {
     const updatedOptions = localQuestion.options ? [...localQuestion.options] : [];
-    updatedOptions[index] = value;
+    updatedOptions[index].text = value;
     setLocalQuestion({ ...localQuestion, options: updatedOptions });
     setErrors((prev) => ({ ...prev, options: null }));
   };
@@ -138,9 +133,17 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
   };
 
   const confirmDeleteQuestion = () => {
-    deleteQuestion(localQuestion.id);
-    setShowDeleteConfirmation(false);
-    onAddNew(); // Prepare for next question
+    if (localQuestion.id) {
+      deleteQuestion(localQuestion.id);
+      setShowDeleteConfirmation(false);
+      onAddNew(); // Prepare for next question
+    }
+  };
+
+  const addOption = () => {
+    const options: QuestionOption[] = localQuestion.options || [];
+    const newOption: QuestionOption = { ...createPlaceholderOption(), order: options.length };
+    setLocalQuestion({ ...localQuestion, options: [...options, newOption] });
   };
 
   return (
@@ -152,11 +155,11 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <Select value={localQuestion.type} onChange={handleTypeChange} fullWidth sx={{ marginBottom: '1rem' }}>
-        <MenuItem value={QuestionType.MultipleChoice}>Multiple Choice</MenuItem>
+      <Select value={localQuestion.questionType} onChange={handleTypeChange} fullWidth sx={{ marginBottom: '1rem' }}>
+        <MenuItem value={QuestionType.MultiSelect}>Multiple Selection</MenuItem>
         <MenuItem value={QuestionType.FillInTheBlank}>Fill in the Blank</MenuItem>
         <MenuItem value={QuestionType.RatingScale}>Rating Scale</MenuItem>
-        <MenuItem value={QuestionType.Dropdown}>Dropdown</MenuItem>
+        <MenuItem value={QuestionType.SingleSelect}>Single Select</MenuItem>
       </Select>
       <TextField
         label="Question Text"
@@ -171,45 +174,42 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
         helperText={errors.text}
       />
       <Divider sx={{ marginY: '1rem' }} /> {/* Visual separator between sections */}
-      {[QuestionType.MultipleChoice, QuestionType.Dropdown].includes(localQuestion.type) && (
-        <Box>
-          {localQuestion.options?.map((option, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <TextField
-                label={`Option ${index + 1}`}
-                value={option}
-                onChange={(e) => handleOptionChange(index, e.target.value)}
-                fullWidth
-                slotProps={{ htmlInput: { maxLength: MAX_OPTION_LENGTH } }}
-                error={Boolean(errors.options)}
-                helperText={index === 0 && errors.options ? errors.options : ''}
-              />
-              <Button
-                onClick={() => handleDeleteOption(index)}
-                color="secondary"
-                disabled={localQuestion.options?.length === 1} // Disable if only one option left
-              >
-                Delete
-              </Button>
-            </Box>
-          ))}
-          {(localQuestion.options || []).length < MAX_OPTIONS && (
-            <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }}>
-              <Button
-                onClick={() => setLocalQuestion({ ...localQuestion, options: [...(localQuestion.options || []), ''] })}
-                color="primary"
-                sx={{ marginRight: '1rem' }}
-              >
-                Add Option
-              </Button>
-              <Typography variant="body2" color="textSecondary">
-                {`${MAX_OPTIONS - (localQuestion.options || []).length} options remaining`}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      )}
-      {localQuestion.type === QuestionType.RatingScale && localQuestion.options?.length && (
+      {localQuestion.questionType &&
+        [QuestionType.MultiSelect, QuestionType.SingleSelect].includes(localQuestion.questionType) && (
+          <Box>
+            {localQuestion.options?.map((option, index) => (
+              <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <TextField
+                  label={`Option ${index + 1}`}
+                  value={option.text}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  fullWidth
+                  slotProps={{ htmlInput: { maxLength: MAX_OPTION_LENGTH } }}
+                  error={Boolean(errors.options)}
+                  helperText={index === 0 && errors.options ? errors.options : ''}
+                />
+                <Button
+                  onClick={() => handleDeleteOption(index)}
+                  color="secondary"
+                  disabled={localQuestion.options?.length === 1} // Disable if only one option left
+                >
+                  Delete
+                </Button>
+              </Box>
+            ))}
+            {(localQuestion.options || []).length < MAX_OPTIONS && (
+              <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }}>
+                <Button onClick={addOption} color="primary" sx={{ marginRight: '1rem' }}>
+                  Add Option
+                </Button>
+                <Typography variant="body2" color="textSecondary">
+                  {`${MAX_OPTIONS - (localQuestion.options || []).length} options remaining`}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+      {localQuestion.questionType === QuestionType.RatingScale && localQuestion.options?.length && (
         <Box sx={{ marginTop: '1rem' }}>
           <TextField
             label="Minimum Rating"

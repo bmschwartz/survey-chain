@@ -104,10 +104,11 @@ const QuestionEditorSidebar: React.FC<QuestionEditorSidebarProps> = ({ onAddNew 
                 >
                   <CardContent sx={{ pr: 3 }}>
                     <Typography variant="subtitle1">
-                      {index + 1}. {question.text.length > 25 ? `${question.text.substring(0, 25)}...` : question.text}
+                      {index + 1}.{' '}
+                      {(question.text || '').length > 25 ? `${question.text?.substring(0, 25)}...` : question.text}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      Type: {questionTypeToDisplay(question.type)}
+                      Type: {questionTypeToDisplay(question.questionType)}
                     </Typography>
                   </CardContent>
                 </Card>

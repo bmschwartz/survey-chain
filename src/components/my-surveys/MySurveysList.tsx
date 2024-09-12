@@ -22,6 +22,7 @@ const MySurveysList: React.FC = () => {
   const [surveys, setSurveys] = React.useState<MySurveyItem[]>([]);
 
   useQuery(GET_MY_SURVEYS, {
+    fetchPolicy: 'network-only',
     onCompleted: (data) => {
       setSurveys(
         data.mySurveys.map((survey: any) => ({

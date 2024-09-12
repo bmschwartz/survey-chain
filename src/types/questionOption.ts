@@ -1,8 +1,9 @@
-// types/questionOption.ts
 import { QuestionOption as GQLQuestionOption } from '@/graphql/__generated__/graphql';
 
+type QuestionOptionId = string | number;
+
 export interface QuestionOption {
-  id: string; // Required
+  id: QuestionOptionId; // Required
   text?: string;
   order?: number;
 }

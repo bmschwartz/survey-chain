@@ -12,7 +12,6 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey }) => {
   const router = useRouter();
 
   const handleTakeSurvey = () => {
-    console.log('DEBUG - /surveys/', survey.id);
     return router.push(`/surveys/${survey.id}`);
   };
 

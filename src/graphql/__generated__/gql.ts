@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\n  mutation AddSurveyQuestion($surveyId: ID!, $text: String!, $order: Int!, $questionType: QuestionType!, $options: [QuestionOptionInput!]) {\n    addSurveyQuestion(surveyId: $surveyId, text: $text, order: $order, questionType: $questionType, options: $options) {\n      id\n      text\n      order\n      questionType\n      options {\n        id\n        text\n        order\n      }\n    }\n  }\n": types.AddSurveyQuestionDocument,
     "\n  mutation CreateSurvey($title: String!, $description: String!) {\n    createSurvey(title: $title, description: $description) {\n      id\n      title\n      description\n    }\n  }\n": types.CreateSurveyDocument,
     "\n  query GetAllSurveys {\n    surveys {\n      id\n      title\n      description\n      archived\n      createdAt\n      updatedAt\n      visibility\n      isPublished\n      creator {\n        id\n        displayName\n      }\n      questions {\n        id\n      }\n      responses {\n        id\n      }\n    }\n  }\n": types.GetAllSurveysDocument,
     "\n  query GetMySurveys {\n    mySurveys {\n      id\n      title\n      description\n      isPublished\n      archived\n      visibility\n      responses {\n        id\n      }\n      questions {\n        id\n      }\n    }\n  }\n": types.GetMySurveysDocument,
@@ -33,6 +34,10 @@ const documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation AddSurveyQuestion($surveyId: ID!, $text: String!, $order: Int!, $questionType: QuestionType!, $options: [QuestionOptionInput!]) {\n    addSurveyQuestion(surveyId: $surveyId, text: $text, order: $order, questionType: $questionType, options: $options) {\n      id\n      text\n      order\n      questionType\n      options {\n        id\n        text\n        order\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation AddSurveyQuestion($surveyId: ID!, $text: String!, $order: Int!, $questionType: QuestionType!, $options: [QuestionOptionInput!]) {\n    addSurveyQuestion(surveyId: $surveyId, text: $text, order: $order, questionType: $questionType, options: $options) {\n      id\n      text\n      order\n      questionType\n      options {\n        id\n        text\n        order\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

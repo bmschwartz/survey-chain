@@ -1,15 +1,15 @@
 import { QuestionType } from '@/types';
 
-export const questionTypeToDisplay = (type: QuestionType) => {
+export const questionTypeToDisplay = (type: QuestionType | undefined) => {
   switch (type) {
-    case QuestionType.MultipleChoice:
-      return 'Multiple Choice';
+    case QuestionType.MultiSelect:
+      return 'Multiple Select';
     case QuestionType.FillInTheBlank:
       return 'Fill in the Blank';
     case QuestionType.RatingScale:
       return 'Rating Scale';
-    case QuestionType.Dropdown:
-      return 'Dropdown';
+    case QuestionType.SingleSelect:
+      return 'Single Select';
     default:
       return '';
   }

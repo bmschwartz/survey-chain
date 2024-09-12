@@ -25,7 +25,6 @@ export const getSurvey = async (_: unknown, { id }: GetSurveyArgs, { session }: 
     throw new Error('Survey not found.');
   }
 
-  console.log('DEBUG - session:', session);
   if (!survey.isPublished && survey.creatorId !== session?.user?.id) {
     throw new Error('You are not authorized to view this survey.');
   } else if (survey.visibility === Visibility.PRIVATE && survey.creatorId !== session?.user?.id) {

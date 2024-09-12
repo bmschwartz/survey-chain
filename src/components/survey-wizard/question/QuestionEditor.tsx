@@ -1,5 +1,5 @@
 import { Grid2 } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
 import QuestionEditorDetail from './QuestionEditorDetail';

@@ -1,5 +1,6 @@
 import { Box, Button, Container, Step, StepLabel, Stepper, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import React from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
 import SurveyStep from './SurveyStep';
@@ -7,27 +8,27 @@ import SurveyStep from './SurveyStep';
 const steps = ['Basic Information', 'Add Questions', 'Review & Save'];
 
 const SurveyWizard: React.FC = () => {
-  const { activeStep, saveSurvey, setActiveStep, resetSurvey, validateStep, validationErrors } = useSurveyBuilder();
-  // const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const router = useRouter();
+  const { activeStep, saveSurvey, moveToStep, resetSurvey, validateStep, validationErrors } = useSurveyBuilder();
 
   const handleNext = async () => {
     const errors = await validateStep();
-    console.log('Debug errors', errors);
     if (errors.length > 0) {
-      console.log('Debug errors', errors);
       return;
     }
-    // if (activeStep === steps.length - 1) {
-    //   await saveSurvey();
-    //   return;
-    // }
+
     await saveSurvey();
-    console.log('Debug activeStep', activeStep);
-    setActiveStep((prevStep) => prevStep + 1);
+
+    if (activeStep === steps.length - 1) {
+      return router.push('/surveys/my-surveys');
+    }
+
+    moveToStep(activeStep + 1);
   };
 
   const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
+    const previousStep = activeStep - 1;
+    moveToStep(previousStep);
   };
 
   const isLastStep = activeStep === steps.length - 1;
