@@ -10,7 +10,7 @@ const MAX_QUESTION_TEXT_LENGTH = 1000;
 const MAX_OPTION_LENGTH = 300;
 
 interface QuestionEditorDetailProps {
-  question: SurveyQuestion | null;
+  question: SurveyQuestion;
   isNew: boolean;
   onAddNew: () => void;
 }
@@ -18,8 +18,8 @@ interface QuestionEditorDetailProps {
 const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, isNew, onAddNew }) => {
   const { addQuestion, updateQuestion, deleteQuestion, validateStep, createPlaceholderOption, resetNewQuestion } =
     useSurveyBuilder();
-  const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question || resetNewQuestion());
-  const [initialQuestion, setInitialQuestion] = useState<SurveyQuestion | null>(question);
+  const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question);
+  const [initialQuestion, setInitialQuestion] = useState<SurveyQuestion>(question);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
 

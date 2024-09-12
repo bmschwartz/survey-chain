@@ -1,4 +1,3 @@
-// import useSWR, { mutate } from 'swr';
 import { useMutation, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
@@ -23,6 +22,7 @@ interface SurveyBuilderContextType {
   isAddingNewQuestion: boolean;
   validationErrors: ValidationError[];
 
+  isLoading: boolean;
   addQuestion: (newQuestion: SurveyQuestion) => Promise<SurveyQuestion>;
   updateQuestion: (updatedQuestion: SurveyQuestion) => void;
   deleteQuestion: (id: QuestionId) => void;
@@ -78,21 +78,24 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
     );
   }, [surveyId, activeStep]);
 
-  const { data: survey } = useQuery(GET_SURVEY, {
+  const { loading: isGetSurveyLoading } = useQuery(GET_SURVEY, {
     fetchPolicy: 'network-only',
     variables: { id: surveyId ?? '' },
-    onCompleted: ({ survey }) => {
-      if (!survey) {
+    onCompleted: ({ survey: surveyResult }) => {
+      if (!surveyResult) {
+        console.log('DEBUG no survey');
         return;
       }
 
-      const transformedQuestions = survey.questions.map(transformSurveyQuestion);
+      console.log('DEBUG received survey');
+      const transformedQuestions = surveyResult.questions.map(transformSurveyQuestion);
 
-      setSurveyId(survey.id);
-      setTitle(survey.title);
-      setDescription(survey.description);
+      setSurveyId(surveyResult.id);
+      setTitle(surveyResult.title);
+      setDescription(surveyResult.description);
       setQuestions(transformedQuestions);
 
+      console.log('DEBUG selected question', selectedQuestion);
       if (!selectedQuestion) {
         setSelectedQuestion(transformedQuestions.length > 0 ? transformedQuestions[0] : null);
       }
@@ -155,13 +158,16 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
     order: 0,
   });
 
-  const resetNewQuestion = (): SurveyQuestion => ({
-    id: Date.now().toString(),
-    text: '',
-    order: questions.length,
-    questionType: QuestionType.MultiSelect,
-    options: [createPlaceholderOption()],
-  });
+  const resetNewQuestion = (): SurveyQuestion => {
+    console.log('DEBUG reset new question with questions length', questions.length);
+    return {
+      id: Date.now().toString(),
+      text: '',
+      order: questions.length,
+      questionType: QuestionType.MultiSelect,
+      options: [createPlaceholderOption()],
+    };
+  };
 
   const addQuestion = async (newQuestion: SurveyQuestion): Promise<SurveyQuestion> => {
     console.log('Debug question data to add', surveyId, newQuestion.text, newQuestion.questionType, newQuestion.order);
@@ -317,7 +323,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
 
   const saveSurvey = async () => {
     console.log('Debug save survey');
-    if (!survey) {
+    if (!surveyId) {
       await createNewSurvey();
       return;
     }
@@ -336,6 +342,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
         validationErrors,
         selectedQuestion,
         isAddingNewQuestion,
+        isLoading: isGetSurveyLoading || createSurveyLoading || addSurveyQuestionLoading,
         setIsAddingNewQuestion,
         moveToStep,
         setTitle,
