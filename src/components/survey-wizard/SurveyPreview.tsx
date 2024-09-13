@@ -3,7 +3,7 @@ import { Accordion, AccordionDetails, AccordionSummary, CardContent, Divider, Ty
 import React, { useState } from 'react';
 
 import { useSurveyBuilder } from '@/contexts/SurveyBuilderContext';
-import { Question, QuestionType } from '@/types';
+import { QuestionType, SurveyQuestion } from '@/types';
 import { questionTypeToDisplay } from '@/utils/question';
 
 const SurveyPreview: React.FC = () => {
@@ -24,8 +24,8 @@ const SurveyPreview: React.FC = () => {
         {description}
       </Typography>
       <Divider />
-      {questions.map((question: Question, index: number) => {
-        const isExpandable = question.type !== QuestionType.FillInTheBlank;
+      {questions.map((question: SurveyQuestion, index: number) => {
+        const isExpandable = question.questionType !== QuestionType.FillInTheBlank;
         return (
           <Accordion
             key={index}
@@ -60,21 +60,21 @@ const SurveyPreview: React.FC = () => {
                 Q{index + 1}: {question.text}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary', marginLeft: 'auto', marginRight: '8px' }}>
-                {questionTypeToDisplay(question.type)}
+                {questionTypeToDisplay(question.questionType)}
               </Typography>
             </AccordionSummary>
             {isExpandable && (
               <AccordionDetails sx={{ paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
                 <CardContent>
-                  {question.type === QuestionType.RatingScale ? (
+                  {question.questionType === QuestionType.RatingScale ? (
                     <>
-                      <Typography variant="body2">Min: {question.options?.[0]}</Typography>
-                      <Typography variant="body2">Max: {question.options?.[1]}</Typography>
+                      <Typography variant="body2">Min: {question.minValue}</Typography>
+                      <Typography variant="body2">Max: {question.maxValue}</Typography>
                     </>
                   ) : (
                     question.options?.map((option, optionIndex) => (
                       <Typography key={optionIndex} variant="body2">
-                        - {option}
+                        - {option.text}
                       </Typography>
                     ))
                   )}
