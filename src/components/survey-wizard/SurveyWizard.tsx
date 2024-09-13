@@ -9,7 +9,7 @@ const steps = ['Basic Information', 'Add Questions', 'Review & Save'];
 
 const SurveyWizard: React.FC = () => {
   const router = useRouter();
-  const { activeStep, saveSurvey, moveToStep, resetSurvey, validateStep, validationErrors } = useSurveyBuilder();
+  const { activeStep, saveSurvey, moveToStep, validateStep, validationErrors } = useSurveyBuilder();
 
   const handleNext = async () => {
     const errors = await validateStep();
@@ -47,14 +47,6 @@ const SurveyWizard: React.FC = () => {
           <Typography sx={{ mt: 2, mb: 1, textAlign: 'center' }}>
             All steps completed - you&apos;re finished!
           </Typography>
-          <Button
-            onClick={resetSurvey}
-            variant="outlined"
-            color="secondary"
-            sx={{ display: 'block', margin: '0 auto' }}
-          >
-            Reset
-          </Button>
         </>
       ) : (
         <>

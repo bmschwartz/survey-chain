@@ -23,8 +23,6 @@ const SurveyDetailsPage: React.FC = () => {
 
   if (loading) return <CircularProgress />;
   if (error || !data?.survey) {
-    console.log('DEBUG error or no data', error, data);
-    return <>Help!</>;
     return router.push('/404');
   }
 

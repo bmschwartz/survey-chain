@@ -105,7 +105,7 @@ type Mutation {
   archiveSurvey(id: ID!): Survey!
 
   addSurveyQuestion(surveyId: ID!, text: String!, questionType: QuestionType!, order: Int!, minValue: Int, maxValue: Int, options: [QuestionOptionInput!]): SurveyQuestion!
-  updateSurveyQuestion(id: ID!, text: String, order: Int, minValue: Int, maxValue: Int, options: [QuestionOptionInput!]): SurveyQuestion!
+  updateSurveyQuestion(id: ID!, text: String, questionType: QuestionType, order: Int, minValue: Int, maxValue: Int, options: [QuestionOptionInput!]): SurveyQuestion!
   deleteSurveyQuestion(id: ID!): SurveyQuestion!
 
   submitSurveyResponse(surveyId: ID!, answers: [ResponseInput!]!): SurveyResponse!

@@ -16,36 +16,18 @@ interface QuestionEditorDetailProps {
 }
 
 const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, isNew, onAddNew }) => {
-  const { addQuestion, updateQuestion, deleteQuestion, validateStep, createPlaceholderOption, resetNewQuestion } =
-    useSurveyBuilder();
-  const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question);
-  const [initialQuestion, setInitialQuestion] = useState<SurveyQuestion>(question);
+  const { addQuestion, updateQuestion, deleteQuestion, validateStep, createPlaceholderOption } = useSurveyBuilder();
+  const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question); // Use localQuestion directly
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
 
-  const hasLocalChanges = !isEqual(initialQuestion, localQuestion);
+  const hasLocalChanges = !isEqual(localQuestion, question);
 
+  // Handle updating localQuestion when question prop changes (from selectedQuestion)
   useEffect(() => {
-    if (!question || !initialQuestion) {
-      return;
+    if (question) {
+      setLocalQuestion(question);
     }
-    if (question.id && question.id !== initialQuestion.id) {
-      setInitialQuestion(question);
-    }
-  }, [question, initialQuestion]);
-
-  useEffect(() => {
-    // Ensure there's at least one empty option for MultiSelect or SingleSelect
-    if (
-      (localQuestion.questionType === QuestionType.MultiSelect ||
-        localQuestion.questionType === QuestionType.SingleSelect) &&
-      (!localQuestion.options || localQuestion.options.length === 0)
-    ) {
-      setLocalQuestion({ ...localQuestion, options: [createPlaceholderOption()] });
-      return;
-    }
-
-    setLocalQuestion(initialQuestion || resetNewQuestion());
   }, [question]);
 
   const validateQuestion = () => {
@@ -82,11 +64,9 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
     if (validateQuestion()) {
       if (isNew) {
         const newQ = await addQuestion(localQuestion);
-        console.log('DEBUG new question', newQ);
         onAddNew();
       } else {
         updateQuestion(localQuestion);
-        setInitialQuestion(localQuestion);
       }
     }
     await validateStep();
@@ -103,7 +83,6 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
         { ...createPlaceholderOption(), text: '1' },
         { ...createPlaceholderOption(), order: 1, text: '5' },
       ];
-      console.log('DEBUG RatingScale new options', newOptions);
     }
 
     setLocalQuestion({ ...localQuestion, questionType: newType, options: newOptions });
@@ -173,7 +152,7 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
         error={Boolean(errors.text)}
         helperText={errors.text}
       />
-      <Divider sx={{ marginY: '1rem' }} /> {/* Visual separator between sections */}
+      <Divider sx={{ marginY: '1rem' }} />
       {localQuestion.questionType &&
         [QuestionType.MultiSelect, QuestionType.SingleSelect].includes(localQuestion.questionType) && (
           <Box>
@@ -191,7 +170,7 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
                 <Button
                   onClick={() => handleDeleteOption(index)}
                   color="secondary"
-                  disabled={localQuestion.options?.length === 1} // Disable if only one option left
+                  disabled={localQuestion.options?.length === 1}
                 >
                   Delete
                 </Button>

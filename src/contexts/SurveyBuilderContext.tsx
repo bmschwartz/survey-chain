@@ -22,7 +22,6 @@ interface SurveyBuilderContextType {
   isAddingNewQuestion: boolean;
   validationErrors: ValidationError[];
 
-  isLoading: boolean;
   addQuestion: (newQuestion: SurveyQuestion) => Promise<SurveyQuestion>;
   updateQuestion: (updatedQuestion: SurveyQuestion) => void;
   deleteQuestion: (id: QuestionId) => void;
@@ -78,16 +77,14 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
     );
   }, [surveyId, activeStep]);
 
-  const { loading: isGetSurveyLoading } = useQuery(GET_SURVEY, {
+  const { data: { survey } = {}, refetch: refetchSurvey } = useQuery(GET_SURVEY, {
     fetchPolicy: 'network-only',
     variables: { id: surveyId ?? '' },
     onCompleted: ({ survey: surveyResult }) => {
       if (!surveyResult) {
-        console.log('DEBUG no survey');
         return;
       }
 
-      console.log('DEBUG received survey');
       const transformedQuestions = surveyResult.questions.map(transformSurveyQuestion);
 
       setSurveyId(surveyResult.id);
@@ -95,14 +92,19 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
       setDescription(surveyResult.description);
       setQuestions(transformedQuestions);
 
-      console.log('DEBUG selected question', selectedQuestion);
       if (!selectedQuestion) {
         setSelectedQuestion(transformedQuestions.length > 0 ? transformedQuestions[0] : null);
       }
     },
   });
 
-  const [createSurvey, { loading: createSurveyLoading, error: createSurveyError }] = useMutation(CREATE_SURVEY, {
+  useEffect(() => {
+    if (surveyId) {
+      refetchSurvey();
+    }
+  }, [surveyId]);
+
+  const [createSurvey] = useMutation(CREATE_SURVEY, {
     onCompleted: ({ createSurvey: data }) => {
       if (!data) {
         return;
@@ -110,23 +112,11 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
       setSurveyId(data.id);
       setTitle(data.title);
       setDescription(data.description);
-      console.log('Create survey data onComplete', data);
     },
   });
 
-  const [
-    addSurveyQuestion,
-    { data: addSurveyQuestionData, loading: addSurveyQuestionLoading, error: addSurveyQuestionError },
-  ] = useMutation(ADD_SURVEY_QUESTION, {
-    onCompleted: ({ addSurveyQuestion: result }) => {
-      console.log(
-        'Add survey question data onComplete',
-        result,
-        addSurveyQuestionData,
-        addSurveyQuestionLoading,
-        addSurveyQuestionError
-      );
-    },
+  const [addSurveyQuestion] = useMutation(ADD_SURVEY_QUESTION, {
+    onCompleted: ({ addSurveyQuestion: result }) => {},
   });
 
   const transformSurveyQuestion = (gqlQuestion: GQLSurveyQuestion): SurveyQuestion => {
@@ -159,7 +149,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
   });
 
   const resetNewQuestion = (): SurveyQuestion => {
-    console.log('DEBUG reset new question with questions length', questions.length);
     return {
       id: Date.now().toString(),
       text: '',
@@ -170,7 +159,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
   };
 
   const addQuestion = async (newQuestion: SurveyQuestion): Promise<SurveyQuestion> => {
-    console.log('Debug question data to add', surveyId, newQuestion.text, newQuestion.questionType, newQuestion.order);
     if (!surveyId || !newQuestion.text || !newQuestion.questionType || newQuestion.order === undefined) {
       throw new Error('Invalid question data');
     }
@@ -180,14 +168,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
         throw new Error('Invalid option data');
       }
     }
-
-    console.log('Debug add question', {
-      surveyId,
-      text: newQuestion.text,
-      order: newQuestion.order,
-      questionType: newQuestion.questionType,
-      options: newQuestion.options?.map((o) => ({ text: o.text!, order: o.order! })) || [],
-    });
 
     const result = await addSurveyQuestion({
       variables: {
@@ -204,21 +184,9 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
       throw new Error('Failed to add question');
     }
 
-    console.log('Debug created question', createdQuestion);
-    const { id, options, order, questionType, text } = createdQuestion;
-    const transformedQuestion: SurveyQuestion = {
-      id,
-      text,
-      order,
-      questionType,
-      options: options.map((o) => ({ id: o.id, text: o.text, order: o.order })),
-    };
-
-    console.log('Debug transformed question', transformedQuestion);
+    const transformedQuestion: SurveyQuestion = transformSurveyQuestion(createdQuestion);
     setQuestions([...questions, transformedQuestion]);
     setSelectedQuestion(transformedQuestion);
-
-    console.log('Debug questions and selected', questions, selectedQuestion);
 
     return transformedQuestion;
   };
@@ -322,7 +290,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
   };
 
   const saveSurvey = async () => {
-    console.log('Debug save survey');
     if (!surveyId) {
       await createNewSurvey();
       return;
@@ -342,7 +309,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
         validationErrors,
         selectedQuestion,
         isAddingNewQuestion,
-        isLoading: isGetSurveyLoading || createSurveyLoading || addSurveyQuestionLoading,
         setIsAddingNewQuestion,
         moveToStep,
         setTitle,

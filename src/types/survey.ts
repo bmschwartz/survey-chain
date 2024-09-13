@@ -20,7 +20,6 @@ export interface Survey {
 }
 
 export const transformSurvey = (graphqlSurvey: GQLSurvey): Survey => {
-  console.log('DEBUG graphqlSurvey', graphqlSurvey);
   return {
     id: graphqlSurvey.id,
     title: graphqlSurvey.title,

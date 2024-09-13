@@ -83,6 +83,7 @@ export type MutationUpdateSurveyQuestionArgs = {
   minValue?: InputMaybe<Scalars['Int']['input']>;
   options?: InputMaybe<Array<QuestionOptionInput>>;
   order?: InputMaybe<Scalars['Int']['input']>;
+  questionType?: InputMaybe<QuestionType>;
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
