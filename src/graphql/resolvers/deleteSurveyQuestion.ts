@@ -8,17 +8,34 @@ interface DeleteSurveyQuestionArgs {
 }
 
 export const deleteSurveyQuestion = async (_: unknown, { id }: DeleteSurveyQuestionArgs, { session }: GQLContext) => {
-  if (!session.user.id) {
+  const userId = session?.user?.id;
+
+  if (!userId) {
     throw new Error('You must be logged in to delete.');
   }
 
-  const surveyQuestion = await prisma.surveyQuestion.findUnique({
-    where: { id, survey: { creatorId: session.user.id } },
+  const surveyQuestion = await prisma.surveyQuestion.findFirst({
+    where: {
+      id,
+      survey: {
+        creatorId: userId,
+      },
+    },
+    include: {
+      survey: true,
+    },
   });
 
   if (!surveyQuestion) {
     throw new Error('Survey question not found.');
   }
 
-  return await prisma.surveyQuestion.delete({ where: { id } });
+  if (surveyQuestion.survey.isPublished) {
+    throw new Error('Cannot delete a question from a published survey.');
+  }
+
+  // Proceed with deleting the survey question
+  return await prisma.surveyQuestion.delete({
+    where: { id },
+  });
 };

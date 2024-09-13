@@ -101,7 +101,7 @@ type Query {
 # Mutations to create and update surveys, questions, and responses
 type Mutation {
   createSurvey(title: String!, description: String!): Survey!
-  updateSurvey(id: ID!, title: String, description: String, visibility: Visibility): Survey!
+  updateSurvey(id: ID!, title: String, description: String, visibility: Visibility, isPublished: Boolean): Survey!
   archiveSurvey(id: ID!): Survey!
 
   addSurveyQuestion(surveyId: ID!, text: String!, questionType: QuestionType!, order: Int!, minValue: Int, maxValue: Int, options: [QuestionOptionInput!]): SurveyQuestion!
@@ -119,6 +119,7 @@ input ResponseInput {
 }
 
 input QuestionOptionInput {
+  id: ID
   text: String!
   order: Int!
 }

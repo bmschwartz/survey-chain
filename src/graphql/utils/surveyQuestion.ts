@@ -1,6 +1,6 @@
 import { isUndefined } from 'lodash';
 
-import { QuestionType } from '@/graphql/types';
+import { QuestionOptionInput, QuestionType } from '@/graphql/types';
 
 export interface UpsertSurveyQuestionArgs {
   text: string;
@@ -8,20 +8,12 @@ export interface UpsertSurveyQuestionArgs {
   minValue?: number;
   maxValue?: number;
   questionType: QuestionType;
-  options?: { text: string; order: number }[];
+  options?: QuestionOptionInput[];
 }
 
 export const validateUpsertArgs = (args: UpsertSurveyQuestionArgs): string | null => {
   if (args.questionType === QuestionType.RatingScale && (isUndefined(args.minValue) || isUndefined(args.maxValue))) {
     return 'Rating scale requires minValue and maxValue';
-  }
-
-  if (!args.text || args.text.length === 0) {
-    return 'Question text is required';
-  }
-
-  if (isUndefined(args.order)) {
-    return 'Order is required';
   }
 
   if (

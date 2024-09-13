@@ -1,5 +1,7 @@
 import '@/auth';
 
+import { isUndefined } from 'lodash';
+
 import { validateUpsertArgs } from '@/graphql/utils/surveyQuestion';
 import { prisma } from '@/lib/prisma';
 import { GQLContext } from '@/types';
@@ -13,6 +15,15 @@ const validateArgs = (args: AddSurveyQuestionArgs): string | null => {
   if (!args.surveyId) {
     return 'Survey ID missing';
   }
+
+  if (!args.text || args.text.length === 0) {
+    return 'Question text is required';
+  }
+
+  if (isUndefined(args.order)) {
+    return 'Order is required';
+  }
+
   return validateUpsertArgs(args);
 };
 
@@ -44,7 +55,7 @@ export const addSurveyQuestion = async (_: unknown, args: AddSurveyQuestionArgs,
       questionType,
       options: {
         createMany: {
-          data: options || [],
+          data: options?.map((o) => ({ text: o.text, order: o.order })) || [],
         },
       },
     },
