@@ -4,6 +4,7 @@ import React, { createContext, ReactNode, useContext, useEffect, useState } from
 
 import ADD_SURVEY_QUESTION from '@/graphql/mutations/AddSurveyQuestion';
 import CREATE_SURVEY from '@/graphql/mutations/CreateSurvey';
+import UPDATE_SURVEY_QUESTION from '@/graphql/mutations/UpdateSurveyQuestion';
 import GET_SURVEY from '@/graphql/queries/GetSurvey';
 import { SurveyQuestion as GQLSurveyQuestion } from '@/graphql/types';
 import { QuestionId, QuestionOption, QuestionType, SurveyQuestion } from '@/types';
@@ -75,9 +76,21 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
       undefined,
       { shallow: true }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surveyId, activeStep]);
 
-  const { data: { survey } = {}, refetch: refetchSurvey } = useQuery(GET_SURVEY, {
+  const transformSurveyQuestion = (gqlQuestion: GQLSurveyQuestion): SurveyQuestion => {
+    const { id, text, order, questionType, options } = gqlQuestion;
+    return {
+      id,
+      text,
+      order,
+      questionType,
+      options: options.map((o) => ({ id: o.id, text: o.text, order: o.order })),
+    };
+  };
+
+  const { refetch: refetchSurvey } = useQuery(GET_SURVEY, {
     fetchPolicy: 'network-only',
     variables: { id: surveyId ?? '' },
     onCompleted: ({ survey: surveyResult }) => {
@@ -102,6 +115,8 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
     if (surveyId) {
       refetchSurvey();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surveyId]);
 
   const [createSurvey] = useMutation(CREATE_SURVEY, {
@@ -115,20 +130,8 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
     },
   });
 
-  const [addSurveyQuestion] = useMutation(ADD_SURVEY_QUESTION, {
-    onCompleted: ({ addSurveyQuestion: result }) => {},
-  });
-
-  const transformSurveyQuestion = (gqlQuestion: GQLSurveyQuestion): SurveyQuestion => {
-    const { id, text, order, questionType, options } = gqlQuestion;
-    return {
-      id,
-      text,
-      order,
-      questionType,
-      options: options.map((o) => ({ id: o.id, text: o.text, order: o.order })),
-    };
-  };
+  const [addSurveyQuestion] = useMutation(ADD_SURVEY_QUESTION);
+  const [updateSurveyQuestion] = useMutation(UPDATE_SURVEY_QUESTION);
 
   const resetSurvey = () => {
     setTitle('');
@@ -143,14 +146,14 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
   };
 
   const createPlaceholderOption = (): QuestionOption => ({
-    id: Date.now().toString(),
+    id: Math.floor(Math.random() * 1000000),
     text: '',
     order: 0,
   });
 
   const resetNewQuestion = (): SurveyQuestion => {
     return {
-      id: Date.now().toString(),
+      id: Math.floor(Math.random() * 1000000),
       text: '',
       order: questions.length,
       questionType: QuestionType.MultiSelect,
@@ -191,8 +194,38 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
     return transformedQuestion;
   };
 
-  const updateQuestion = (updatedQuestion: SurveyQuestion) => {
-    const updatedQuestions = questions.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q));
+  const updateQuestion = async (updatedQuestion: SurveyQuestion) => {
+    if (!surveyId || !updatedQuestion.text || !updatedQuestion.questionType || updatedQuestion.order === undefined) {
+      throw new Error('Invalid question data');
+    }
+    const options =
+      updatedQuestion.options?.map((o) => {
+        if (!o.text || o.order === undefined) {
+          throw new Error('Invalid option data');
+        }
+
+        const oId = typeof o.id === 'string' ? o.id : undefined;
+        return { id: oId, text: o.text, order: o.order };
+      }) || [];
+
+    const result = await updateSurveyQuestion({
+      variables: {
+        id: updatedQuestion.id as string,
+        text: updatedQuestion.text,
+        order: updatedQuestion.order,
+        questionType: updatedQuestion.questionType,
+        options,
+      },
+    });
+
+    const resultQuestion = result.data?.updateSurveyQuestion;
+    if (!resultQuestion) {
+      throw new Error('Failed to add question');
+    }
+
+    const transformedQuestion: SurveyQuestion = transformSurveyQuestion(resultQuestion);
+
+    const updatedQuestions = questions.map((q) => (q.id === updatedQuestion.id ? transformedQuestion : q));
     setQuestions(updatedQuestions);
   };
 

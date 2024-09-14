@@ -199,6 +199,8 @@ export type AddSurveyQuestionMutationVariables = Exact<{
   text: Scalars['String']['input'];
   order: Scalars['Int']['input'];
   questionType: QuestionType;
+  minValue?: InputMaybe<Scalars['Int']['input']>;
+  maxValue?: InputMaybe<Scalars['Int']['input']>;
   options?: InputMaybe<Array<QuestionOptionInput> | QuestionOptionInput>;
 }>;
 
@@ -209,6 +211,8 @@ export type AddSurveyQuestionMutation = {
     id: string;
     text: string;
     order: number;
+    minValue?: number | null;
+    maxValue?: number | null;
     questionType: QuestionType;
     options: Array<{ __typename?: 'QuestionOption'; id: string; text: string; order: number }>;
   };
@@ -222,6 +226,30 @@ export type CreateSurveyMutationVariables = Exact<{
 export type CreateSurveyMutation = {
   __typename?: 'Mutation';
   createSurvey: { __typename?: 'Survey'; id: string; title: string; description: string };
+};
+
+export type UpdateSurveyQuestionMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  text?: InputMaybe<Scalars['String']['input']>;
+  questionType?: InputMaybe<QuestionType>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+  minValue?: InputMaybe<Scalars['Int']['input']>;
+  maxValue?: InputMaybe<Scalars['Int']['input']>;
+  options?: InputMaybe<Array<QuestionOptionInput> | QuestionOptionInput>;
+}>;
+
+export type UpdateSurveyQuestionMutation = {
+  __typename?: 'Mutation';
+  updateSurveyQuestion: {
+    __typename?: 'SurveyQuestion';
+    id: string;
+    text: string;
+    order: number;
+    minValue?: number | null;
+    maxValue?: number | null;
+    questionType: QuestionType;
+    options: Array<{ __typename?: 'QuestionOption'; id: string; text: string; order: number }>;
+  };
 };
 
 export type GetAllSurveysQueryVariables = Exact<{ [key: string]: never }>;
@@ -328,6 +356,16 @@ export const AddSurveyQuestionDocument = {
         },
         {
           kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'minValue' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'maxValue' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
           variable: { kind: 'Variable', name: { kind: 'Name', value: 'options' } },
           type: {
             kind: 'ListType',
@@ -370,6 +408,16 @@ export const AddSurveyQuestionDocument = {
                 name: { kind: 'Name', value: 'options' },
                 value: { kind: 'Variable', name: { kind: 'Name', value: 'options' } },
               },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'minValue' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'minValue' } },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'maxValue' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'maxValue' } },
+              },
             ],
             selectionSet: {
               kind: 'SelectionSet',
@@ -377,6 +425,8 @@ export const AddSurveyQuestionDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'text' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minValue' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxValue' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'questionType' } },
                 {
                   kind: 'Field',
@@ -449,6 +499,128 @@ export const CreateSurveyDocument = {
     },
   ],
 } as unknown as DocumentNode<CreateSurveyMutation, CreateSurveyMutationVariables>;
+export const UpdateSurveyQuestionDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateSurveyQuestion' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'text' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'questionType' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'QuestionType' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'order' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'minValue' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'maxValue' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'options' } },
+          type: {
+            kind: 'ListType',
+            type: {
+              kind: 'NonNullType',
+              type: { kind: 'NamedType', name: { kind: 'Name', value: 'QuestionOptionInput' } },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateSurveyQuestion' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'text' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'text' } },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'order' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'order' } },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questionType' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'questionType' } },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'minValue' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'minValue' } },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'maxValue' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'maxValue' } },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'options' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'options' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'text' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minValue' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxValue' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questionType' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'options' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'text' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateSurveyQuestionMutation, UpdateSurveyQuestionMutationVariables>;
 export const GetAllSurveysDocument = {
   kind: 'Document',
   definitions: [

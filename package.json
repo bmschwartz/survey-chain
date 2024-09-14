@@ -26,6 +26,9 @@
       "prettier --ignore-path .gitignore --write"
     ]
   },
+  "eslintIgnore": [
+    "src/graphql/__generated__"
+  ],
   "dependencies": {
     "@apollo/client": "3.11.8",
     "@apollo/server": "4.11.0",

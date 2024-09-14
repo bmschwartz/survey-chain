@@ -17,18 +17,22 @@ interface QuestionEditorDetailProps {
 
 const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, isNew, onAddNew }) => {
   const { addQuestion, updateQuestion, deleteQuestion, validateStep, createPlaceholderOption } = useSurveyBuilder();
-  const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question); // Use localQuestion directly
+
+  // Initialize the local state with the incoming question prop
+  const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question);
+  const [initialQuestion, setInitialQuestion] = useState<SurveyQuestion>(question); // Save initial state
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
 
-  const hasLocalChanges = !isEqual(localQuestion, question);
+  const hasLocalChanges = !isEqual(localQuestion, initialQuestion); // Compare local state with initial state
 
-  // Handle updating localQuestion when question prop changes (from selectedQuestion)
+  // Update the local state when the selected question changes
   useEffect(() => {
-    if (question) {
+    if (question.id !== initialQuestion.id) {
+      setInitialQuestion(question);
       setLocalQuestion(question);
     }
-  }, [question]);
+  }, [question, initialQuestion]);
 
   const validateQuestion = () => {
     let valid = true;
@@ -63,10 +67,11 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
   const handleSaveQuestion = async () => {
     if (validateQuestion()) {
       if (isNew) {
-        const newQ = await addQuestion(localQuestion);
+        await addQuestion(localQuestion);
         onAddNew();
       } else {
-        updateQuestion(localQuestion);
+        await updateQuestion(localQuestion);
+        setInitialQuestion(localQuestion);
       }
     }
     await validateStep();

@@ -1,13 +1,8 @@
 import { GetServerSidePropsContext } from 'next';
-import { Session } from 'next-auth';
 import React from 'react';
 
-import { auth, signIn } from '@/auth';
+import { auth } from '@/auth';
 import MySurveysView from '@/views/my-surveys/MySurveysView';
-
-interface MySurveysPageProps {
-  session: Session;
-}
 
 const MySurveysPage: React.FC = () => {
   return <MySurveysView />;
