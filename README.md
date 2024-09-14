@@ -1,4 +1,4 @@
-# SurveyChain
+# SurveyChain [WIP]
 
 SurveyChain is a decentralized survey creation and management platform that leverages blockchain technology to provide transparent, secure, and verifiable surveys. This project demonstrates how to manage survey data with a focus on privacy and integrity using a hybrid approach of both on-chain and off-chain storage. It offers survey creators the ability to build custom surveys, collect responses, and review analytics—all while ensuring data privacy through encryption and verifiability through blockchain.
 
