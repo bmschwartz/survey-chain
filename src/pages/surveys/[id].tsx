@@ -1,4 +1,3 @@
-// pages/surveys/[id].tsx
 import { useQuery } from '@apollo/client';
 import { CircularProgress, Container } from '@mui/material';
 import { useSession } from 'next-auth/react';

@@ -12,10 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Validate the incoming request body against the sign-up schema
     const { email, password, confirmPassword, displayName } = signUpSchema.parse(req.body);
 
-    // Check if the user already exists
     const where = displayName ? { OR: [{ email }, { displayName }] } : { email };
 
     const existingUser = await prisma.user.findFirst({ where });
@@ -27,10 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords don't match" });
     }
-    // Hash the password
+
     const hashedPassword = await saltAndHashPassword(password);
 
-    // Create the new user and credential
     const user = await prisma.user.create({
       data: {
         email,
@@ -43,7 +40,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    // Respond with the newly created user (excluding the hashed password)
     return res.status(201).json({
       id: user.id,
       email: user.email,

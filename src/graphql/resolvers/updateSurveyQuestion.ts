@@ -16,10 +16,8 @@ const validateArgs = (args: UpdateSurveyQuestionArgs): string | null => {
 };
 
 const updateOptionsPromises = (questionId: string, options: QuestionOptionInput[]) => {
-  // Map through options to create/update them
   return options.map((o) => {
     if (!o.id) {
-      // Create new option
       return prisma.questionOption.create({
         data: {
           text: o.text,
@@ -29,9 +27,8 @@ const updateOptionsPromises = (questionId: string, options: QuestionOptionInput[
       });
     }
 
-    // Update existing option based on id
     return prisma.questionOption.update({
-      where: { id: o.id }, // Only 'id' is required for updates
+      where: { id: o.id },
       data: {
         text: o.text,
         order: o.order,
@@ -54,7 +51,6 @@ export const updateSurveyQuestion = async (_: unknown, args: UpdateSurveyQuestio
 
   const { id, text, questionType, order, minValue, maxValue, options } = args;
 
-  // Find the survey question belonging to the authenticated user's survey
   const question = await prisma.surveyQuestion.findFirst({
     where: {
       id,
@@ -66,12 +62,10 @@ export const updateSurveyQuestion = async (_: unknown, args: UpdateSurveyQuestio
     throw new Error('Question not found');
   }
 
-  // Process question options (create or update as needed)
   if (options && options.length > 0) {
     await Promise.allSettled(updateOptionsPromises(question.id, options));
   }
 
-  // Update the main survey question
   return await prisma.surveyQuestion.update({
     where: { id },
     data: {

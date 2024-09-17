@@ -1,4 +1,3 @@
-// components/survey-details/SurveyQuestions.tsx
 import { Box, List, ListItem, ListItemText, Typography } from '@mui/material';
 import React from 'react';
 

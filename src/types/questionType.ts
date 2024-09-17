@@ -1,4 +1,3 @@
-// types/questionType.ts
 import { QuestionType as GQLQuestionType } from '@/graphql/__generated__/graphql';
 
 export enum QuestionType {

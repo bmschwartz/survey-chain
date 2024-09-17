@@ -1,4 +1,3 @@
-// types/responseAnswer.ts
 import { ResponseAnswer as GQLResponseAnswer } from '@/graphql/__generated__/graphql';
 import { AnswerType, transformAnswerType } from './answerType';
 import { SurveyQuestion, transformSurveyQuestion } from './surveyQuestion';

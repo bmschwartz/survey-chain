@@ -1,4 +1,3 @@
-// types/survey.ts
 import { Survey as GQLSurvey } from '@/graphql/__generated__/graphql';
 import { SurveyQuestion, transformSurveyQuestion } from './surveyQuestion';
 import { SurveyResponse, transformSurveyResponse } from './surveyResponse';

@@ -37,7 +37,7 @@ const providers: Provider[] = [
         const isMatchingPassword = await comparePassword(password, user?.credential?.hashedPassword ?? '');
 
         if (!user?.credential || !isMatchingPassword) {
-          return null; // Explicitly return null if user not found
+          return null;
         }
 
         return {
@@ -48,10 +48,10 @@ const providers: Provider[] = [
         };
       } catch (error) {
         if (error instanceof ZodError) {
-          return null; // Explicitly return null on validation error
+          return null;
         }
 
-        return null; // Return null on any other errors
+        return null;
       }
     },
   }),

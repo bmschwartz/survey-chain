@@ -26,13 +26,13 @@ const SignInForm: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<SignInFormData> = async (data) => {
-    setError(null); // Clear previous errors
+    setError(null);
 
     try {
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: false, // Prevent auto redirect, handle manually
+        redirect: false,
       });
 
       if (result?.error) {

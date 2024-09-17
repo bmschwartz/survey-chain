@@ -14,7 +14,7 @@ const FullScreenLoader: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        zIndex: 1300, // Ensure it's above other elements
+        zIndex: 1300,
       }}
     >
       <CircularProgress />

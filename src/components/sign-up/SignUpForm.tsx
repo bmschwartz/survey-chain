@@ -27,10 +27,9 @@ const SignUpForm: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<SignUpFormData> = async (data) => {
-    setError(null); // Clear previous errors
+    setError(null);
 
     try {
-      // Call your signup API here
       const result = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -45,11 +44,10 @@ const SignUpForm: React.FC = () => {
       });
 
       if (result.ok) {
-        // Automatically sign in the user after successful signup
         await signIn('credentials', {
           email: data.email,
           password: data.password,
-          redirect: false, // Prevent auto redirect, handle manually
+          redirect: false,
         });
 
         router.push('/home');

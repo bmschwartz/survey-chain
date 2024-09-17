@@ -34,7 +34,6 @@ export const deleteSurveyQuestion = async (_: unknown, { id }: DeleteSurveyQuest
     throw new Error('Cannot delete a question from a published survey.');
   }
 
-  // Proceed with deleting the survey question
   return await prisma.surveyQuestion.delete({
     where: { id },
   });

@@ -14,21 +14,21 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ onClick, isActive = false, 
       startIcon={startIcon}
       endIcon={endIcon}
       sx={{
-        color: '#0D3B66', // Updated to primary blue color
+        color: '#0D3B66',
         fontSize: '1.1rem',
         fontWeight: 500,
         marginLeft: '20px',
         padding: '8px 16px',
         fontFamily: 'Poppins, sans-serif',
-        backgroundColor: 'transparent', // Transparent background for header buttons
+        backgroundColor: 'transparent',
         transition: 'all 0.3s ease',
         borderRadius: '8px',
         borderBottomLeftRadius: isActive ? '0' : '8px',
         borderBottomRightRadius: isActive ? '0' : '8px',
         borderBottom: isActive ? '2px solid #0D3B66' : 'none',
         '&:hover': {
-          color: '#1B8ED1', // Lighter blue text color on hover
-          backgroundColor: '#f0f4f8', // Soft background color on hover
+          color: '#1B8ED1',
+          backgroundColor: '#f0f4f8',
           textDecoration: 'none',
         },
       }}

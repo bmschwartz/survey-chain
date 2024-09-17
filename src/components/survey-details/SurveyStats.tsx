@@ -1,4 +1,3 @@
-// components/survey-details/SurveyStats.tsx
 import { Box, Chip, Typography } from '@mui/material';
 import React from 'react';
 

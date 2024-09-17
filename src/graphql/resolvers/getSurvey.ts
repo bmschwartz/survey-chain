@@ -28,7 +28,6 @@ export const getSurvey = async (_: unknown, { id }: GetSurveyArgs, { session }: 
   if (!survey.isPublished && survey.creatorId !== session?.user?.id) {
     throw new Error('You are not authorized to view this survey.');
   } else if (survey.visibility === Visibility.PRIVATE && survey.creatorId !== session?.user?.id) {
-    // TODO: This will be updated to check if the user is a collaborator on the survey
     throw new Error('You are not authorized to view this survey.');
   }
 

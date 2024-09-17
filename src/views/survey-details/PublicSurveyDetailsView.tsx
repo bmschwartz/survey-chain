@@ -1,4 +1,3 @@
-// views/survey-details/PublicSurveyDetailsView.tsx
 import React from 'react';
 
 import SurveyQuestions from '@/components/survey-details/SurveyQuestions';

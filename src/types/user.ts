@@ -1,4 +1,3 @@
-// types/user.ts
 import { User as GQLUser } from '@/graphql/__generated__/graphql';
 
 export interface User {

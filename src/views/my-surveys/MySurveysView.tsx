@@ -8,7 +8,6 @@ const MySurveysView: React.FC = () => {
   const router = useRouter();
 
   const handleCreateSurvey = () => {
-    // Navigate to the survey creation page
     router.push('/surveys/create');
     return;
   };
@@ -24,7 +23,7 @@ const MySurveysView: React.FC = () => {
           sx={{
             borderRadius: '8px',
             padding: '8px 16px',
-            textTransform: 'none', // Avoid all caps for a modern look
+            textTransform: 'none',
           }}
         >
           Create Survey

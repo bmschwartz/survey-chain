@@ -13,10 +13,10 @@ const CreateSurveyView: React.FC = () => {
         sx={{
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
           borderRadius: '8px',
-          transition: 'none', // Disable transition effect on hover
+          transition: 'none',
           '&:hover': {
-            transform: 'none', // Remove hover scaling effect
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', // Keep original shadow on hover
+            transform: 'none',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
           },
         }}
       >

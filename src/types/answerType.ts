@@ -1,4 +1,3 @@
-// types/answerType.ts
 import { AnswerType as GQLAnswerType } from '@/graphql/__generated__/graphql';
 
 export enum AnswerType {

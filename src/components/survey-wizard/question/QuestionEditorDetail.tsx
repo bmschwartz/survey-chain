@@ -18,15 +18,13 @@ interface QuestionEditorDetailProps {
 const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, isNew, onAddNew }) => {
   const { addQuestion, updateQuestion, deleteQuestion, validateStep, createPlaceholderOption } = useSurveyBuilder();
 
-  // Initialize the local state with the incoming question prop
   const [localQuestion, setLocalQuestion] = useState<SurveyQuestion>(question);
-  const [initialQuestion, setInitialQuestion] = useState<SurveyQuestion>(question); // Save initial state
+  const [initialQuestion, setInitialQuestion] = useState<SurveyQuestion>(question);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string | null }>({});
 
-  const hasLocalChanges = !isEqual(localQuestion, initialQuestion); // Compare local state with initial state
+  const hasLocalChanges = !isEqual(localQuestion, initialQuestion);
 
-  // Update the local state when the selected question changes
   useEffect(() => {
     if (question.id !== initialQuestion.id) {
       setInitialQuestion(question);
@@ -82,7 +80,7 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
     let newOptions: QuestionOption[] = [];
 
     if (newType === QuestionType.MultiSelect || newType === QuestionType.SingleSelect) {
-      newOptions = [createPlaceholderOption()]; // Default to one empty option
+      newOptions = [createPlaceholderOption()];
     } else if (newType === QuestionType.RatingScale) {
       newOptions = [
         { ...createPlaceholderOption(), text: '1' },
@@ -120,7 +118,7 @@ const QuestionEditorDetail: React.FC<QuestionEditorDetailProps> = ({ question, i
     if (localQuestion.id) {
       deleteQuestion(localQuestion.id);
       setShowDeleteConfirmation(false);
-      onAddNew(); // Prepare for next question
+      onAddNew();
     }
   };
 

@@ -41,7 +41,7 @@ const SurveyPreview: React.FC = () => {
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
               },
               '&:before': {
-                display: 'none', // Remove the 1-2px line at the top
+                display: 'none',
               },
             }}
           >
@@ -52,7 +52,7 @@ const SurveyPreview: React.FC = () => {
                 paddingRight: '1.5rem',
                 '& .MuiAccordionSummary-content': {
                   marginLeft: '1rem',
-                  alignItems: 'center', // Vertically center the content
+                  alignItems: 'center',
                 },
               }}
             >

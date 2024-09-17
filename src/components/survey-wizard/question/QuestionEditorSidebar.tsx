@@ -29,7 +29,7 @@ const QuestionEditorSidebar: React.FC<QuestionEditorSidebarProps> = ({ onAddNew 
     const listEl = listRef.current;
     if (listEl) {
       listEl.addEventListener('scroll', handleScroll);
-      handleScroll(); // Check scroll position on load
+      handleScroll();
     }
 
     return () => {

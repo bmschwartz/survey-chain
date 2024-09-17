@@ -1,4 +1,3 @@
-// contexts/MySurveyDetailsContext.tsx
 import React, { createContext, ReactNode, useContext } from 'react';
 
 import { Survey } from '@/types';
