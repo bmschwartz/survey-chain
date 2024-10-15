@@ -9,18 +9,12 @@ generator client {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  displayName   String    @unique
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
+  id              String @id @default(cuid())
+  displayName     String @unique
+  ethereumAddress String @unique
 
   surveys   Survey[]
   responses SurveyResponse[]
-
-  accounts   Account[]
-  sessions   Session[]
-  credential Credential?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -32,7 +26,6 @@ model Survey {
   title       String
   description String?
   isPublished Boolean          @default(false)
-  visibility  Visibility       @default(PUBLIC)
   archived    Boolean          @default(false)
   questions   SurveyQuestion[]
   responses   SurveyResponse[]
@@ -85,11 +78,10 @@ model SurveyResponse {
 }
 
 model ResponseAnswer {
-  id         String     @id @default(cuid())
+  id         String @id @default(cuid())
   responseId String
   questionId String
   answer     Json
-  answerType AnswerType
 
   response SurveyResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
   question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
@@ -98,70 +90,9 @@ model ResponseAnswer {
   updatedAt DateTime @updatedAt
 }
 
-enum AnswerType {
-  FILL_IN_THE_BLANK
-  SINGLE_SELECT
-  MULTI_SELECT
-  RATING_SCALE
-}
-
 enum QuestionType {
   MULTI_SELECT
   FILL_IN_THE_BLANK
   RATING_SCALE
   SINGLE_SELECT
-}
-
-enum Visibility {
-  PUBLIC
-  PRIVATE
-}
-
-model Account {
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([provider, providerAccountId])
-}
-
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
-}
-
-model Credential {
-  id             String @id @default(cuid())
-  userId         String @unique
-  hashedPassword String
-  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

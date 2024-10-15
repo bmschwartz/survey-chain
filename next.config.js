@@ -7,7 +7,7 @@ const nextConfig = {
       exclude: /node_modules/,
       use: ['graphql-tag/loader'],
     });
-
+    config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;
   },
 };

@@ -1,56 +1,92 @@
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { ZodError } from 'zod';
+import { getAddressFromMessage, getChainIdFromMessage, verifySignature } from '@reown/appkit-siwe';
+import NextAuth, { User } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
 import { prisma } from '@/lib/prisma';
-import { comparePassword } from '@/utils/password';
-import { signInSchema } from '@/validators/zod';
 
-import type { User } from 'next-auth';
+import type { SIWESession } from '@reown/appkit-siwe';
 import type { Provider } from 'next-auth/providers';
 
 interface SessionUser extends User {
+  id: string;
   displayName?: string;
+  ethereumAddress?: string;
 }
 
 declare module 'next-auth' {
-  interface Session {
+  interface Session extends SIWESession {
+    chainId: number;
+    address: string;
     user: SessionUser;
   }
 }
 
+const nextAuthSecret = process.env.AUTH_SECRET;
+if (!nextAuthSecret) {
+  throw new Error('AUTH_SECRET is not set');
+}
+
+const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID;
+if (!projectId) {
+  throw new Error('NEXT_PUBLIC_PROJECT_ID is not set');
+}
+
 const providers: Provider[] = [
-  Credentials({
+  CredentialsProvider({
+    name: 'Ethereum',
     credentials: {
-      email: { label: 'Email', type: 'text' },
-      password: { label: 'Password', type: 'password' },
+      message: {
+        label: 'Message',
+        type: 'text',
+        placeholder: '0x0',
+      },
+      signature: {
+        label: 'Signature',
+        type: 'text',
+        placeholder: '0x0',
+      },
     },
-    authorize: async (credentials) => {
+    async authorize(credentials) {
+      console.log('DEBUG credentials', credentials);
+
       try {
-        if (!credentials) {
+        if (!credentials?.message) {
+          throw new Error('SiweMessage is required');
+        }
+
+        const message = credentials.message as string;
+        const signature = credentials.signature as string;
+
+        const address = getAddressFromMessage(message);
+        const chainId = getChainIdFromMessage(message);
+
+        const isValid = await verifySignature({ address, message, signature, chainId, projectId });
+
+        if (!isValid) {
           return null;
         }
 
-        const { email, password } = await signInSchema.parseAsync(credentials);
-        const user = await prisma.user.findUnique({ where: { email }, include: { credential: true } });
-        const isMatchingPassword = await comparePassword(password, user?.credential?.hashedPassword ?? '');
+        let user = await prisma.user.findUnique({
+          where: { ethereumAddress: address },
+        });
 
-        if (!user?.credential || !isMatchingPassword) {
-          return null;
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              ethereumAddress: address,
+              displayName: address,
+            },
+          });
         }
 
         return {
-          id: user.id,
-          email: user.email,
-          image: user.image,
+          id: `${chainId}:${address}`,
+          userId: user.id,
+          address: user.ethereumAddress,
           displayName: user.displayName,
         };
-      } catch (error) {
-        if (error instanceof ZodError) {
-          return null;
-        }
-
+      } catch {
         return null;
       }
     },
@@ -61,25 +97,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   callbacks: {
     authorized: async ({ auth }) => {
+      console.log('DEBUG authorized callback', auth);
       return !!auth;
     },
-    jwt: async ({ token, user }: { token: any; user: SessionUser }) => {
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.image = user.image;
-        token.displayName = user.displayName as string;
+    session: async ({ session, token, user }) => {
+      console.log('DEBUG session callback', session, token, user);
+
+      if (!token.sub) {
+        return session;
       }
 
-      return token;
-    },
-    session: async ({ session, token }) => {
-      session.userId = token.id as string;
       session.user.id = token.id as string;
-      session.user.email = token.email as string;
-      session.user.image = token.image as string;
       session.user.displayName = token.displayName as string;
 
+      const [, chainId, address] = token.sub.split(':');
+      if (chainId && address) {
+        session.address = address;
+        session.chainId = parseInt(chainId, 10);
+        session.user.ethereumAddress = address;
+      }
+
+      console.log('DEBUG returning session', session);
       return session;
     },
   },

@@ -21,10 +21,12 @@ const CreateSurveyPage: React.FC = () => {
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const session = await auth(ctx);
+  const cookies = ctx.req.headers.cookie || '';
 
   return {
     props: {
       session,
+      cookies,
     },
   };
 }

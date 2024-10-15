@@ -10,6 +10,7 @@ const MySurveysPage: React.FC = () => {
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const session = await auth(ctx);
+  const cookies = ctx.req.headers.cookie || '';
 
   if (!session) {
     return {
@@ -20,7 +21,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
-  return { props: {} };
+  return { props: { cookies } };
 }
 
 export default MySurveysPage;

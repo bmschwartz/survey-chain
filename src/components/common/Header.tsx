@@ -1,8 +1,9 @@
 import { ArrowDropDown as ArrowDropDownIcon, Login as LoginIcon } from '@mui/icons-material';
 import { AppBar, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import React, { MouseEvent, useState } from 'react';
+import React, { MouseEvent, useCallback, useState } from 'react';
 
 import HeaderButton from './HeaderButton';
 
@@ -10,6 +11,13 @@ const Header: React.FC = () => {
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState<HTMLElement | null>(null);
   const router = useRouter();
   const { data: session } = useSession();
+
+  const { open: openLoginModal } = useWeb3Modal();
+
+  const onClickSignIn = useCallback(() => {
+    console.log('DEBUG openLoginModal');
+    openLoginModal();
+  }, [openLoginModal]);
 
   const handleUserMenuClick = (event: MouseEvent<HTMLButtonElement>) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -105,8 +113,8 @@ const Header: React.FC = () => {
             </Menu>
           </>
         ) : (
-          <HeaderButton startIcon={<LoginIcon />} onClick={() => signIn()}>
-            Sign In / Register
+          <HeaderButton startIcon={<LoginIcon />} onClick={onClickSignIn}>
+            Sign In
           </HeaderButton>
         )}
       </Toolbar>
